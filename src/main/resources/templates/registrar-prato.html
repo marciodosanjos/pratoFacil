@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Novo Prato</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d;
+            background-color: #faf6f0;
+            margin: 0;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #cda45e;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #0c0b09;
+            font-size: 26px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #cda45e;
+            font-style: italic;
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1d6c6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            color: #0c0b09;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e1d6c6;
+            border-radius: 4px;
+            background-color: #fcfaf7;
+            font-size: 15px;
+            color: #3e322d;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #cda45e;
+            background-color: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #cda45e;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #b89252;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7a6a60;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #cda45e;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Gestão do Cardápio</h1>
+    <p>Adicione novas opções deliciosas ao menu</p>
+</div>
+
+<div class="form-container">
+    <form th:action="@{/admin/pratos/registrar}" th:object="${pratoObjeto}" method="POST">
+
+        <div class="form-group">
+            <label th:for="nome">Nome do Prato</label>
+            <input type="text" th:field="*{nome}" placeholder="Ex: Feijoada Completa" required />
+        </div>
+
+        <div class="form-group">
+            <label th:for="descricao">Descrição / Ingredientes</label>
+            <textarea th:field="*{descricao}" placeholder="Ex: Carne seca, lombo, paio. Acompanha arroz, couve e farofa." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label th:for="preco">Preço (R$)</label>
+            <input type="number" step="0.01" th:field="*{preco}" placeholder="Ex: 49.90" required />
+        </div>
+
+        <button type="submit" class="btn-submit">Cadastrar no Cardápio</button>
+    </form>
+</div>
+
+<a th:href="@{/cardapio}" class="nav-link">← Visualizar Cardápio Atual</a>
+
+</body>
+</html>

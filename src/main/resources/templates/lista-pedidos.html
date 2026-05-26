@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Meus Pedidos</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d;
+            background-color: #faf6f0;
+            margin: 0;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #cda45e;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #0c0b09;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #cda45e;
+            font-style: italic;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Card individual do Pedido */
+        .pedido-card {
+            background-color: #ffffff;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #cda45e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pedido-info h3 {
+            margin: 0 0 8px 0;
+            color: #0c0b09;
+            font-size: 18px;
+        }
+
+        .pedido-meta {
+            font-size: 14px;
+            color: #7a6a60;
+        }
+
+        .pedido-status-price {
+            text-align: right;
+        }
+
+        .price-tag {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0c0b09;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Badges estilizadas por Status */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Altera as cores baseado no status do Enum */
+        .status-processando {
+            background-color: #fff9e6;
+            color: #b89252;
+            border: 1px solid #ffe8b3;
+        }
+
+        .status-finalizado {
+            background-color: #e6f9ed;
+            color: #1e7e34;
+            border: 1px solid #b3f0c2;
+        }
+
+        .status-cancelado {
+            background-color: #fce8e6;
+            color: #c82333;
+            border: 1px solid #f5c6cb;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #7a6a60;
+            font-style: italic;
+            border: 1px dashed #e1d6c6;
+            background-color: #fcfaf7;
+            border-radius: 4px;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: transparent;
+            color: #cda45e;
+            border: 1px solid #cda45e;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-voltar:hover {
+            background-color: #cda45e;
+            color: #ffffff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 13px;
+            color: #a08f85;
+            border-top: 1px solid #e1d6c6;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Meus Pedidos</h1>
+    <p>Acompanhe o andamento dos seus pedidos em tempo real</p>
+</div>
+
+<div th:if="${!#lists.isEmpty(pedidos)}">
+
+    <div class="pedido-card" th:each="p : ${pedidos}">
+        <div class="pedido-info">
+            <h3 th:text="${p.nome}">Pedido #1234</h3>
+            <div class="pedido-meta">
+                <span>ID do Pedido: </span><span th:text="${p.id}">1</span>
+            </div>
+        </div>
+
+        <div class="pedido-status-price">
+            <span class="price-tag" th:text="${p.valorTotal != null} ? 'R$ ' + ${#numbers.formatDecimal(p.valorTotal, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
+
+            <span th:class="'status-badge ' +
+                            (${p.status.name() == 'PROCESSANDO'} ? 'status-processando' : '') +
+                            (${p.status.name() == 'FINALIZADO'} ? 'status-finalizado' : '') +
+                            (${p.status.name() == 'CANCELADO'} ? 'status-cancelado' : '')"
+                  th:text="${p.status}">
+                STATUS
+            </span>
+        </div>
+    </div>
+
+</div>
+
+<div class="no-orders" th:if="${#lists.isEmpty(pedidos)}">
+    Você ainda não realizou nenhum pedido hoje.
+</div>
+
+<div style="text-align: center;">
+    <a href="/pratos" class="btn-voltar">Fazer Novo Pedido</a>
+</div>
+
+<div class="footer">
+    <p>VendeFácil • Agradecemos a preferência!</p>
+</div>
+
+</body>
+</html>

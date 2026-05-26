@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cardápio Digital</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d;
+            background-color: #faf6f0;
+            margin: 0;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #cda45e;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #0c0b09;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #cda45e;
+            font-style: italic;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .section-title {
+            color: #0c0b09;
+            font-size: 20px;
+            border-left: 4px solid #cda45e;
+            padding-left: 12px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .menu-table td {
+            padding: 15px 0;
+            vertical-align: top;
+            border-bottom: 1px solid #e1d6c6;
+        }
+
+        .item-details {
+            width: 65%;
+            padding-right: 20px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #0c0b09;
+            margin: 0 0 6px 0;
+        }
+
+        .item-description {
+            font-size: 14px;
+            color: #7a6a60;
+            margin: 0;
+        }
+
+        .item-actions {
+            width: 35%;
+            text-align: right;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .item-price {
+            font-weight: bold;
+            font-size: 18px;
+            color: #cda45e;
+            margin-right: 15px;
+            display: inline-block;
+        }
+
+        /* Controle de quantidade robusto */
+        .quantity-control {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #cda45e;
+            border-radius: 4px;
+            background-color: #ffffff;
+            font-size: 16px;
+            color: #3e322d;
+            text-align: center;
+        }
+
+        .no-items {
+            text-align: center;
+            padding: 30px;
+            color: #7a6a60;
+            font-style: italic;
+            border: 1px dashed #e1d6c6;
+            background-color: #fcfaf7;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        /* Botão Confirmar Pedido */
+        .btn-confirmar {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 40px auto 20px auto;
+            padding: 15px 30px;
+            background-color: #cda45e;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(205, 164, 94, 0.3);
+        }
+
+        .btn-confirmar:hover {
+            background-color: #b89252;
+        }
+
+        .btn-confirmar:active {
+            transform: scale(0.98);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 13px;
+            color: #a08f85;
+            border-top: 1px solid #e1d6c6;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Nosso Cardápio</h1>
+    <p>Escolha os itens desejados e monte o seu pedido</p>
+</div>
+
+<div class="section-title">Pratos Principais</div>
+
+<form th:action="@{/novo-pedido}" method="POST" th:if="${!#lists.isEmpty(pratos)}">
+
+    <table class="menu-table">
+        <tr th:each="c, iterStat : ${pratos}">
+            <td class="item-details">
+                <h3 class="item-name" th:text="${c.nome}">Nome do Prato</h3>
+                <p class="item-description" th:text="${c.descricao}">Descrição detalhada do prato.</p>
+            </td>
+            <td class="item-actions">
+                <span class="item-price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 45,00</span>
+
+                <input type="hidden" th:name="|pratos[${iterStat.index}].id|" th:value="${c.id}" />
+
+                <input type="number"
+                       class="quantity-control"
+                       min="0"
+                       max="20"
+                       value="1" />
+            </td>
+        </tr>
+    </table>
+
+    <button type="submit" class="btn-confirmar">Confirmar Pedido</button>
+</form>
+
+<div class="no-items" th:if="${#lists.isEmpty(pratos)}">
+    Nenhum prato disponível no momento.
+</div>
+
+<div class="footer">
+    <p>Obrigado pela preferência! • Todos os direitos reservados</p>
+</div>
+
+</body>
+</html>

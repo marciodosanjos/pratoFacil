@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo - VendeFácil</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d;
+            background-color: #faf6f0;
+            margin: 0;
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #cda45e;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #0c0b09;
+            font-size: 32px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #cda45e;
+            font-style: italic;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Grid de Opções */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* Estilo dos Cards Administrativos */
+        .admin-card {
+            background-color: #ffffff;
+            border: 1px solid #e1d6c6;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(205, 164, 94, 0.2);
+            border-color: #cda45e;
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .admin-card h2 {
+            color: #0c0b09;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-card p {
+            color: #7a6a60;
+            font-size: 14px;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        /* Botões dentro dos Cards */
+        .btn-admin {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #cda45e;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-card:hover .btn-admin {
+            background-color: #0c0b09;
+            color: #cda45e;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 13px;
+            color: #a08f85;
+            border-top: 1px solid #e1d6c6;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Painel de Controle</h1>
+    <p>Bem-vindo ao ambiente de gestão do VendeFácil</p>
+</div>
+
+<div class="admin-grid">
+
+    <a th:href="@{/admin/pratos/registrar}" class="admin-card">
+        <div>
+            <div class="card-icon">➕</div>
+            <h2>Adicionar Prato</h2>
+            <p>Cadastre novas opções, pratos, bebidas ou sobremesas no menu do restaurante.</p>
+        </div>
+        <span class="btn-admin">Acessar</span>
+    </a>
+
+    <a th:href="@{/admin/pratos}" class="admin-card">
+        <div>
+            <div class="card-icon">📋</div>
+            <h2>Gerenciar Cardápio</h2>
+            <p>Visualize a lista completa, altere preços, modifique descrições ou remova itens.</p>
+        </div>
+        <span class="btn-admin">Acessar</span>
+    </a>
+
+    <a th:href="@{/meus-pedidos}" class="admin-card">
+        <div>
+            <div class="card-icon">🛍️</div>
+            <h2>Acompanhar Pedidos</h2>
+            <p>Gerencie o status das vendas do balcão e acompanhe a produção em tempo real.</p>
+        </div>
+        <span class="btn-admin">Acessar</span>
+    </a>
+
+</div>
+
+<div class="footer">
+    <p>VendeFácil Admin • Painel do Estabelecimento</p>
+</div>
+
+</body>
+</html>

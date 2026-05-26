@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido Confirmado!</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d;
+            background-color: #faf6f0;
+            margin: 0;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .success-card {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #cda45e;
+            margin-top: 50px;
+        }
+
+        .icon-success {
+            font-size: 60px;
+            color: #cda45e;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #0c0b09;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 15px 0;
+        }
+
+        p {
+            color: #7a6a60;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 0 30px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: #fcfaf7;
+            border: 1px dashed #cda45e;
+            color: #b89252;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        /* Botões de Navegação */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: 280px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #cda45e;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(205, 164, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #b89252;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #7a6a60;
+            border: 1px solid #e1d6c6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #fcfaf7;
+            color: #0c0b09;
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 13px;
+            color: #a08f85;
+        }
+    </style>
+</head>
+<body>
+
+<div class="success-card">
+    <div class="icon-success">✓</div>
+
+    <h1>Pedido Recebido!</h1>
+
+    <p>Seu pedido foi registrado no sistema com sucesso e a cozinha já foi notificada para iniciar o preparo.</p>
+
+    <div class="status-badge">
+        Status: Processando
+    </div>
+
+    <div class="btn-group">
+        <a th:href="@{/meus-pedidos}" class="btn btn-primary">Acompanhar meu Pedido</a>
+        <a href="/cardapio" class="btn btn-secondary">Voltar ao Cardápio</a>
+    </div>
+</div>
+
+<div class="footer">
+    <p>VendeFácil • Conectando você ao melhor sabor</p>
+</div>
+
+</body>
+</html>
