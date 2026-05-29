@@ -1,9 +1,9 @@
 package com.example.vendeFacil.model;
 
 public enum Status {
-    PROCESSANDO("Processando"),
-    CANCELADO("Cancelado"),
-    FINALIZADO("Finalizado");
+    EM_PREPARO("Em preparo"),
+    SAIU_PARA_ENTREGA("Saiu para entrega"),
+    ENTREGUE("Entregue");
 
     private final String descricao;
 

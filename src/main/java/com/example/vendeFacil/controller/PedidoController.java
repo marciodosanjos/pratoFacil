@@ -24,14 +24,14 @@ public class PedidoController {
     @PostMapping("/novo-pedido")
     public String novoPedido(@ModelAttribute Pedido pedido) {
 
-        // 1. Garante que o status inicial seja PROCESSANDO
+        // 1. Garante que o status inicial seja EM_PREPARO
         if (pedido.getStatus() == null) {
-            pedido.setStatus(Status.PROCESSANDO);
+            pedido.setStatus(Status.EM_PREPARO);
         }
 
         // 2. Define um nome padrão/identificador para o pedido já que o form não envia um campo de texto "nome"
         if (pedido.getNome() == null || pedido.getNome().trim().isEmpty()) {
-            pedido.setNome("Pedido Balcão #" + (System.currentTimeMillis() % 10000));
+            pedido.setNome("Pedido #" + (System.currentTimeMillis() % 10000));
         }
 
         double totalCalculado = 0.0;

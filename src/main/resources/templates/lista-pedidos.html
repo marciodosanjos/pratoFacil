@@ -84,22 +84,22 @@
         }
 
         /* Altera as cores baseado no status do Enum */
-        .status-processando {
+        .status-em_preparo {
             background-color: #fff9e6;
             color: #b89252;
             border: 1px solid #ffe8b3;
         }
 
-        .status-finalizado {
+        .status-saiu_para_entrega {
+            background-color: #e6f0fc;
+            color: #2155b8;
+            border: 1px solid #b3ccf0;
+        }
+
+        .status-entregue {
             background-color: #e6f9ed;
             color: #1e7e34;
             border: 1px solid #b3f0c2;
-        }
-
-        .status-cancelado {
-            background-color: #fce8e6;
-            color: #c82333;
-            border: 1px solid #f5c6cb;
         }
 
         .no-orders {
@@ -163,10 +163,10 @@
             <span class="price-tag" th:text="${p.valorTotal != null} ? 'R$ ' + ${#numbers.formatDecimal(p.valorTotal, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
 
             <span th:class="'status-badge ' +
-                            (${p.status.name() == 'PROCESSANDO'} ? 'status-processando' : '') +
-                            (${p.status.name() == 'FINALIZADO'} ? 'status-finalizado' : '') +
-                            (${p.status.name() == 'CANCELADO'} ? 'status-cancelado' : '')"
-                  th:text="${p.status}">
+                            (${p.status.name() == 'EM_PREPARO'} ? 'status-em_preparo' : '') +
+                            (${p.status.name() == 'SAIU_PARA_ENTREGA'} ? 'status-saiu_para_entrega' : '') +
+                            (${p.status.name() == 'ENTREGUE'} ? 'status-entregue' : '')"
+                  th:text="${p.status.descricao}">
                 STATUS
             </span>
         </div>
