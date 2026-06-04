@@ -5,10 +5,11 @@ aplicação **Java + Spring Boot 4** que ajuda pequenos empreendedores do ramo
 alimentício a gerenciar o ciclo de vida dos pedidos (cardápio, pedidos e status de
 entrega), aplicando na prática conceitos de sistemas distribuídos: arquitetura
 cliente-servidor, API REST, protocolo HTTP, middleware, transparência, persistência
-de dados e serviços em nuvem. Funciona como um pequeno **marketplace**: cada loja
-tem seu próprio cardápio e o cliente escolhe em qual loja deseja pedir. O cardápio é
-organizado por **categorias** e o pedido é montado em um **carrinho**, com seletor de
-**quantidade** por item.
+de dados, **integração com webservice externo (pagamento)** e serviços em nuvem.
+Funciona como um pequeno **marketplace**: cada loja tem seu próprio cardápio e o
+cliente escolhe em qual loja deseja pedir. O cardápio é organizado por **categorias**
+e o pedido é montado em um **carrinho**, com seletor de **quantidade** por item e
+**pagamento** (PIX ou cartão) ao final.
 
 ## Problemática
 
@@ -26,7 +27,9 @@ nos pedidos. O PratoFácil centraliza esse controle em um sistema simples e desa
 
 - **Java 21**
 - **Spring Boot 4** (Spring Web MVC, Spring Data JPA, Spring Security, Thymeleaf)
-- **Banco de dados:** H2 em memória (perfil `dev`) e **PostgreSQL em nuvem / Render** (perfil `prod`)
+- **Banco de dados:** H2 em **arquivo** (perfil `dev` — os dados persistem entre reinícios) e **PostgreSQL em nuvem / Render** (perfil `prod`); H2 em memória nos testes
+- **Pagamentos:** integração com o gateway **Asaas** (sandbox) — cobrança **PIX** (QR Code) + confirmação assíncrona via **webhook**
+- **Deploy:** **Docker** (build multi-stage) + **Render** (`Dockerfile` e `render.yaml` incluídos)
 - **springdoc-openapi** (Swagger UI / OpenAPI 3)
 - **Maven** (wrapper `mvnw` incluído)
 - Testes: JUnit 5 + Spring MockMvc
@@ -42,11 +45,12 @@ Padrão **MVC** com **camada de serviço** isolando as regras de negócio. O mes
 ```
 Cliente (Postman / navegador / app)  ->  HTTP  ->  API REST Spring Boot
      ->  Camada de Serviço (regras de negócio)  ->  Spring Data JPA  ->  Banco de Dados
+                                              \->  HTTP  ->  Gateway de pagamento (Asaas)
 ```
 
 ## Perfis, papéis e lojas
 
-- **Perfis:** `dev` (H2 em memória, padrão) e `prod` (PostgreSQL em nuvem via variáveis de ambiente).
+- **Perfis:** `dev` (H2 em arquivo, padrão — dados persistem) e `prod` (PostgreSQL em nuvem via variáveis de ambiente).
 - **Papéis:** `ADMIN` (lojista, dono de uma loja) e `CLIENTE` (cliente final, com conta). Senhas com hash BCrypt.
 - **Marketplace:** o cliente entra na **vitrine de lojas** (`/lojas`) e escolhe onde pedir; cada lojista gerencia apenas a própria loja (cardápio, pedidos e dashboard).
 
@@ -59,12 +63,30 @@ Lojas de exemplo criadas na primeira execução (cada uma com seu cardápio):
 | Forno Italiano | `fornoitaliano@pratofacil.com` | `pizza123` |
 | Império do Açaí | `imperiodoacai@pratofacil.com` | `acai123` |
 
+## Pagamentos (PIX e cartão)
+
+Ao finalizar o pedido, o cliente é levado a uma **tela de pagamento** com duas opções:
+
+- **PIX** — quando a integração com o **Asaas** está configurada, o app cria a cobrança
+  e exibe o **QR Code** e o **código copia-e-cola** reais (consumindo a API do Asaas).
+  O **webhook** `/webhooks/asaas` recebe o evento de pagamento e marca o pedido como
+  **Pago** automaticamente.
+- **Cartão de crédito** — formulário de checkout (ambiente de testes; nenhum dado de
+  cartão é armazenado).
+
+Em seguida é exibida a **tela de confirmação** ("Pagamento confirmado!"). A integração
+é **opcional e degrada com elegância**: sem a chave do Asaas, o app funciona como uma
+**simulação** de pagamento (útil para rodar localmente sem dependências externas).
+
+A chave fica na variável de ambiente `ASAAS_API_KEY` (nunca no repositório). Opcionalmente,
+`ASAAS_WEBHOOK_TOKEN` valida o token enviado pelo Asaas no webhook.
+
 ## Como executar
 
 Pré-requisito: **Java 21**.
 
 ```bash
-# perfil dev (H2), na raiz do projeto
+# perfil dev (H2 em arquivo), na raiz do projeto
 ./mvnw spring-boot:run
 ```
 
@@ -79,6 +101,18 @@ A aplicação sobe em `http://localhost:8080`.
 | Swagger (documentação da API) | `http://localhost:8080/swagger-ui.html` |
 | Console H2 (perfil dev) | `http://localhost:8080/h2-console` |
 
+Para testar o **PIX real** localmente, rode com a chave do Asaas (sandbox):
+
+```bash
+# Windows PowerShell
+$env:ASAAS_API_KEY = "sua_chave_sandbox"
+./mvnw spring-boot:run
+```
+
+> O webhook só alcança uma URL **pública**; localmente conclua o pagamento pelo botão
+> "Confirmar pagamento" (ou exponha o app com um túnel). O fluxo automático completo
+> (webhook) é testado no deploy.
+
 ### Executar com PostgreSQL em nuvem (perfil `prod`)
 
 Defina as variáveis de ambiente e ative o perfil `prod`:
@@ -92,6 +126,14 @@ export SPRING_DATASOURCE_PASSWORD="senha"
 ```
 
 > As credenciais **nunca** ficam no repositório — apenas em variáveis de ambiente.
+
+## Deploy (Render + Docker)
+
+O projeto já vem pronto para deploy: `Dockerfile` (build multi-stage) e `render.yaml`
+(Blueprint do Render). O passo a passo está em [`docs/DEPLOY.md`](docs/DEPLOY.md).
+Em resumo: criar um Web Service (runtime Docker) apontando para o repositório, definir
+`SPRING_PROFILES_ACTIVE=prod`, as variáveis `SPRING_DATASOURCE_*` (Postgres) e, para
+pagamentos, `ASAAS_API_KEY`.
 
 ## Endpoints da API REST
 
@@ -108,6 +150,7 @@ Base: `http://localhost:8080/api`
 | GET    | `/api/pedidos/{id}`        | Busca um pedido                     | 200 / 404       | Autenticado |
 | POST   | `/api/pedidos`             | Cria um pedido (RF02)               | 201 / 400 / 401 | CLIENTE |
 | PUT    | `/api/pedidos/{id}/status` | Atualiza o status do pedido (RF03)  | 200 / 404       | ADMIN |
+| POST   | `/webhooks/asaas`          | Recebe eventos de pagamento (Asaas) | 200             | Público (token opcional) |
 
 O valor total do pedido é **calculado no servidor** a partir dos pratos enviados.
 Status possíveis: `EM_PREPARO`, `SAIU_PARA_ENTREGA`, `ENTREGUE`.
@@ -148,25 +191,34 @@ As respostas de erro da API vêm em JSON padronizado (sem stacktrace):
 ```
 
 Inclui testes de integração (MockMvc) cobrindo cardápio público, segurança (401),
-papéis (ADMIN), erros (400/404) e criação de pedido com valor total calculado.
+papéis (ADMIN), erros (400/404) e criação de pedido com valor total calculado. Os
+testes rodam em um banco H2 **em memória** isolado (perfil `test`), sem afetar os
+dados de desenvolvimento.
 
 ## Estrutura do projeto
 
 ```
 src/main/java/com/example/vendeFacil
-├── controller   # Controllers REST (/api) e Web (Thymeleaf), Auth, Dashboard e erros
-├── service      # Regras de negócio (Cardapio, Pedido, Usuario)
+├── controller   # Controllers REST (/api), Web (Thymeleaf), Auth, Perfil, Dashboard, webhook e erros
+├── service      # Regras de negócio (Cardapio, Pedido, Usuario, Pagamento, Asaas, MetodoPagamento)
 ├── repository   # Repositórios Spring Data JPA
-├── model        # Entidades JPA (Cardapio, Pedido, Usuario) e enums (Status, Role)
-├── exception    # Exceções de domínio (RecursoNaoEncontrado, RegraNegocio)
-└── config       # Segurança, OpenAPI/Swagger e carga inicial (admin)
+├── model        # Entidades JPA (Loja, Cardapio, Pedido, ItemPedido, Usuario, MetodoPagamento)
+│                #   e enums (Status, Role, Categoria, StatusPagamento, TipoPagamento)
+├── dto          # Objetos de transferência (PedidoRequest)
+├── util         # Utilitários (processamento da logo da loja)
+├── exception    # Exceções de domínio (RecursoNaoEncontrado, RegraNegocio, SessaoInvalida)
+└── config       # Segurança, OpenAPI/Swagger e carga inicial (lojas + cardápios)
 src/main/resources/templates   # Páginas HTML (Thymeleaf)
-docs/ARTIGO.md                 # Artigo (relatório final) da disciplina
+Dockerfile · render.yaml       # Deploy (Docker + Render)
+docs/                          # Artigo, guia de deploy e roteiro de apresentação
 ```
 
 ## Documentação
 
-O relatório/artigo da disciplina está em [`docs/ARTIGO.md`](docs/ARTIGO.md).
+- [`docs/ARTIGO.md`](docs/ARTIGO.md) — artigo (relatório final) da disciplina.
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — guia de deploy no Render.
+- [`docs/APRESENTACAO.md`](docs/APRESENTACAO.md) — roteiro da apresentação.
+- [`docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf`](docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf) — enunciado oficial da avaliação.
 
 ## Integrantes
 

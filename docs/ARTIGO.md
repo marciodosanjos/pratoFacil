@@ -117,7 +117,8 @@ padronizado, sem expor detalhes internos (*stack trace*).
 
 A persistência é feita com **Spring Data JPA** sobre um banco relacional. O projeto
 foi estruturado com **perfis de execução**: no perfil de desenvolvimento (`dev`)
-utiliza-se **H2 em memória** (prático para desenvolvimento e testes), e no perfil de
+utiliza-se **H2 em arquivo** (os dados persistem entre reinícios do servidor; nos
+testes automatizados usa-se um H2 em memória isolado), e no perfil de
 produção (`prod`) a aplicação utiliza um **PostgreSQL hospedado em nuvem** (provedor
 **Render**), com as credenciais fornecidas por variáveis de ambiente. A conexão foi
 **validada em execução**: a aplicação conectou-se ao PostgreSQL na nuvem (versão 18),
@@ -134,14 +135,41 @@ com autenticação baseada em formulário e em **HTTP Basic** (para testes da AP
 de **autorização por papéis**: `ADMIN` (empreendedor) e `CLIENTE`. As senhas são
 armazenadas com **hash BCrypt**, e cada cliente acessa somente os próprios pedidos.
 
+### 2.6 Integração com Webservice Externo e Comunicação Assíncrona (Webhook)
+
+O fluxo de **pagamento** é o exemplo mais direto de **comunicação entre sistemas
+distribuídos** no projeto: a aplicação não processa o pagamento sozinha — ela se
+**integra a um serviço de terceiros**, o gateway **Asaas** (em ambiente *sandbox*).
+Essa integração ocorre em duas direções, ilustrando dois paradigmas de comunicação:
+
+- **Comunicação síncrona (aplicação → Asaas):** ao finalizar o pedido, o servidor
+  consome a **API REST do Asaas** via HTTP (cliente `RestClient` do Spring),
+  criando o cliente e a cobrança **PIX** e obtendo o **QR Code**. Aqui o PratoFácil
+  atua como **cliente** de outro webservice, evidenciando a interoperabilidade entre
+  sistemas heterogêneos por meio de contratos HTTP/JSON.
+- **Comunicação assíncrona (Asaas → aplicação) via *webhook*:** quando o pagamento é
+  confirmado, o Asaas envia, por conta própria, uma requisição HTTP para o *endpoint*
+  `/webhooks/asaas` da aplicação, que então atualiza o status do pedido para *Pago*.
+  Esse padrão **orientado a eventos** (*event-driven*) desacopla os sistemas no tempo:
+  a aplicação não fica "perguntando" se o pagamento ocorreu (*polling*) — ela é
+  **notificada** quando o evento acontece. Opcionalmente, valida-se um *token* no
+  cabeçalho da requisição para garantir a autenticidade da chamada.
+
+A integração foi desenhada para **degradar com elegância**: sem a chave de API
+configurada, a etapa de pagamento opera como uma **simulação** local, mantendo a
+aplicação funcional sem a dependência externa — uma decisão útil tanto para
+desenvolvimento quanto para a demonstração acadêmica.
+
 ## 3. Metodologia e Desenvolvimento
 
 ### 3.1 Tecnologias utilizadas
 
 - **Linguagem:** Java 21
 - **Framework:** Spring Boot 4 (Spring Web MVC, Spring Data JPA, Spring Security, Thymeleaf)
-- **Banco de dados:** H2 (perfil `dev`) e PostgreSQL em nuvem/Render (perfil `prod`)
+- **Banco de dados:** H2 em arquivo (perfil `dev`) e PostgreSQL em nuvem/Render (perfil `prod`)
+- **Pagamentos:** integração com o gateway **Asaas** (sandbox) — cobrança PIX + webhook
 - **Documentação da API:** springdoc-openapi (Swagger UI / OpenAPI 3)
+- **Containerização e deploy:** Docker (build multi-stage) e Render (`render.yaml`)
 - **Build e dependências:** Maven (wrapper `mvnw`)
 - **Testes:** JUnit 5 + Spring MockMvc; Postman/cURL para testes manuais
 - **Versionamento:** Git/GitHub
@@ -158,12 +186,13 @@ exposto por dois tipos de controlador:
 Organização do código:
 
 ```
-controller/   -> controladores REST (/api) e Web (Thymeleaf) + tratamento global de erros
-service/      -> regras de negócio (CardapioService, PedidoService, UsuarioService)
+controller/   -> controladores REST (/api), Web (Thymeleaf), webhook + tratamento global de erros
+service/      -> regras de negócio (Cardapio, Pedido, Usuario, Pagamento, Asaas)
 repository/   -> repositórios Spring Data JPA
-model/        -> entidades JPA (Cardapio, Pedido, Usuario) e enums (Status, Role)
-exception/    -> exceções de domínio (RecursoNaoEncontrado, RegraNegocio)
-config/       -> segurança, documentação OpenAPI e carga inicial de dados
+model/        -> entidades JPA (Loja, Cardapio, Pedido, ItemPedido, Usuario) e enums
+               (Status, Role, Categoria, StatusPagamento, TipoPagamento)
+exception/    -> exceções de domínio (RecursoNaoEncontrado, RegraNegocio, SessaoInvalida)
+config/       -> segurança, documentação OpenAPI e carga inicial (lojas + cardápios)
 ```
 
 Fluxo da aplicação:
@@ -213,7 +242,9 @@ ao vivo); cadastro/login de cliente; **acompanhamento do pedido com linha do tem
 status**; painel do empreendedor com gestão de status; e um **dashboard** com
 indicadores (faturamento, pedidos, clientes e contagem por status). Cada item do
 pedido guarda a sua quantidade (entidade `ItemPedido`), e o valor total considera
-preço × quantidade.
+preço × quantidade. Após o pedido, há uma **tela de pagamento** com escolha de método
+(**PIX**, exibindo o QR Code real obtido do Asaas, ou **cartão de crédito**) e uma
+**tela de confirmação** do pagamento.
 
 ## 4. Documentação de Testes
 
@@ -273,18 +304,30 @@ Como simplificação consciente de escopo acadêmico, a proteção contra CSRF f
 desabilitada para facilitar o consumo da API por clientes HTTP e o uso do console H2;
 em um cenário de produção, recomenda-se reavaliá-la para os formulários web.
 
+**Limitações e escalabilidade.** Dimensionar o sistema honestamente também faz parte
+do exercício. As telas de listagem (pedidos do cliente, pedidos da loja e dashboard)
+carregam todos os registros de uma vez — adequado ao volume acadêmico, mas que pediria
+**paginação** (`Pageable`) à medida que o número de pedidos crescesse. A criação do
+pedido faz uma chamada **síncrona** ao gateway de pagamento, o que acopla a latência
+do pedido à resposta externa; uma evolução natural seria torná-la **assíncrona**.
+Por fim, a hospedagem em camada gratuita (CPU/memória reduzidas e *cold start* após
+inatividade) limita a vazão. Nenhum desses pontos compromete o objetivo do trabalho,
+mas reconhecê-los demonstra a compreensão de onde a arquitetura escala e onde não.
+
 ## 6. Considerações Finais
 
 O desenvolvimento do PratoFácil consolidou, na prática, os principais conceitos da
 disciplina: arquitetura cliente-servidor, API REST, protocolo HTTP, middleware,
-transparência, persistência e serviços em nuvem. Além do aprendizado técnico, o
-projeto evidencia como uma solução simples pode trazer organização e eficiência ao
-dia a dia de pequenos empreendedores.
+transparência, persistência, serviços em nuvem e **integração com um webservice
+externo** (gateway de pagamento) com comunicação síncrona e assíncrona (*webhook*).
+Além do aprendizado técnico, o projeto evidencia como uma solução simples pode trazer
+organização e eficiência ao dia a dia de pequenos empreendedores.
 
-Como evolução futura, prevê-se: o *deploy* da própria aplicação em nuvem (o banco já
-está hospedado no Render), a integração com meios de pagamento, notificações ao
-cliente a cada mudança de status e a construção de um aplicativo móvel consumindo a
-mesma API.
+O projeto também já está **preparado para o *deploy*** da própria aplicação em nuvem
+(contêiner Docker e *blueprint* do Render), somando-se ao banco PostgreSQL já hospedado.
+Como evolução futura, prevê-se: notificações ao cliente a cada mudança de status, a
+**paginação** das listagens, o processamento **assíncrono** do pagamento e a construção
+de um aplicativo móvel consumindo a mesma API.
 
 ## Agradecimentos
 
