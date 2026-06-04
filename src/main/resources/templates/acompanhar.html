@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhar Pedido - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; --green:#1e7e34; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px; max-width:640px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:20px; margin-bottom:30px; }
+        .header h1 { color:var(--dark); font-size:24px; margin:0 0 6px; text-transform:uppercase; letter-spacing:2px; }
+        .header p { color:var(--gold); font-style:italic; margin:0; }
+        .card { background:#fff; border-radius:8px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-left:4px solid var(--gold); margin-bottom:24px; }
+        .resumo { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .resumo h3 { margin:0; color:var(--dark); font-size:18px; }
+        .total { font-size:20px; font-weight:bold; color:var(--dark); }
+        .itens { list-style:none; padding:0; margin:14px 0 0; }
+        .itens li { padding:8px 0; border-bottom:1px solid #f0e9df; font-size:14px; display:flex; justify-content:space-between; }
+        .timeline { display:flex; justify-content:space-between; position:relative; margin:34px 6px 6px; }
+        .timeline::before { content:''; position:absolute; top:16px; left:24px; right:24px; height:3px; background:#e1d6c6; z-index:0; }
+        .step { position:relative; z-index:1; text-align:center; flex:1; }
+        .dot { width:34px; height:34px; border-radius:50%; background:#e1d6c6; color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-weight:bold; border:3px solid var(--cream); }
+        .step.done .dot { background:var(--gold); }
+        .step.current .dot { background:var(--green); box-shadow:0 0 0 4px rgba(30,126,52,0.15); }
+        .step-label { font-size:12px; color:var(--muted); font-weight:bold; line-height:1.3; }
+        .step.done .step-label, .step.current .step-label { color:var(--dark); }
+        .acoes { text-align:center; margin-top:26px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+        .btn { display:inline-block; padding:11px 22px; border:1px solid var(--gold); color:var(--gold); background:transparent; border-radius:4px; text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:13px; }
+        .btn:hover { background:var(--gold); color:#fff; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Acompanhar Pedido</h1>
+    <p>Pedido #<span th:text="${pedido.id}">1</span></p>
+</div>
+
+<div class="card">
+    <div class="resumo">
+        <h3 th:text="${pedido.nome}">Pedido</h3>
+        <span class="total" th:text="${pedido.valorTotal != null} ? 'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
+    </div>
+
+    <ul class="itens">
+        <li th:each="item : ${pedido.cardapios}">
+            <span th:text="${item.nome}">Item</span>
+            <span th:text="${item.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(item.preco,1,'POINT',2,'COMMA')} : ''">R$ 0,00</span>
+        </li>
+    </ul>
+
+    <div class="timeline">
+        <div th:each="s : ${statusList}"
+             class="step"
+             th:classappend="${s.ordinal() < pedido.status.ordinal()} ? 'done' : (${s.ordinal() == pedido.status.ordinal()} ? 'current' : '')">
+            <div class="dot" th:text="${s.ordinal() + 1}">1</div>
+            <div class="step-label" th:text="${s.descricao}">Status</div>
+        </div>
+    </div>
+</div>
+
+<div class="acoes">
+    <a th:href="@{/meus-pedidos}" class="btn">Meus pedidos</a>
+    <a th:href="@{/pratos}" class="btn">Fazer novo pedido</a>
+</div>
+
+</body>
+</html>

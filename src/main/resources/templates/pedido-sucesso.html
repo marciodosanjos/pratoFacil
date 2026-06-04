@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido Confirmado!</title>
     <style>
         body {
@@ -124,12 +125,12 @@
 
     <div class="btn-group">
         <a th:href="@{/meus-pedidos}" class="btn btn-primary">Acompanhar meu Pedido</a>
-        <a href="/cardapio" class="btn btn-secondary">Voltar ao Cardápio</a>
+        <a th:href="@{/pratos}" class="btn btn-secondary">Voltar ao Cardápio</a>
     </div>
 </div>
 
 <div class="footer">
-    <p>VendeFácil • Conectando você ao melhor sabor</p>
+    <p>PratoFácil • Conectando você ao melhor sabor</p>
 </div>
 
 </body>

@@ -41,6 +41,17 @@ public class PedidoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: " + id));
     }
 
+    // Busca um pedido garantindo que ele pertence ao cliente informado
+    // (um cliente nunca acessa o pedido de outro).
+    public Pedido buscarDoCliente(Long id, Usuario cliente) {
+        Pedido pedido = buscarPorId(id);
+        if (cliente == null || pedido.getCliente() == null
+                || !pedido.getCliente().getId().equals(cliente.getId())) {
+            throw new RecursoNaoEncontradoException("Pedido não encontrado: " + id);
+        }
+        return pedido;
+    }
+
     // RF02 - cria o pedido vinculado ao cliente logado. O valor total é SEMPRE
     // calculado no servidor a partir dos pratos enviados (o cliente não envia preço).
     public Pedido criar(Pedido pedido, Usuario cliente) {

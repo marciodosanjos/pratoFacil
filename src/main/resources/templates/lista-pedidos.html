@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Pedidos</title>
     <style>
         body {
@@ -151,7 +152,7 @@
 
 <div th:if="${!#lists.isEmpty(pedidos)}">
 
-    <div class="pedido-card" th:each="p : ${pedidos}">
+    <a class="pedido-card" th:href="@{'/meus-pedidos/' + ${p.id}}" th:each="p : ${pedidos}" style="text-decoration:none; color:inherit;">
         <div class="pedido-info">
             <h3 th:text="${p.nome}">Pedido #1234</h3>
             <div class="pedido-meta">
@@ -170,7 +171,7 @@
                 STATUS
             </span>
         </div>
-    </div>
+    </a>
 
 </div>
 
