@@ -116,11 +116,14 @@ padronizado, sem expor detalhes internos (*stack trace*).
 A persistência é feita com **Spring Data JPA** sobre um banco relacional. O projeto
 foi estruturado com **perfis de execução**: no perfil de desenvolvimento (`dev`)
 utiliza-se **H2 em memória** (prático para desenvolvimento e testes), e no perfil de
-produção (`prod`) a aplicação está preparada para um **PostgreSQL hospedado em
-nuvem** (provedor **Render**), com as credenciais fornecidas por variáveis de
-ambiente. Essa configuração demonstra, na prática, os conceitos de **banco de dados
-em nuvem** e de **transparência de localização**: a aplicação não muda — apenas o
-endereço do banco — ao migrar do ambiente local para o ambiente em nuvem.
+produção (`prod`) a aplicação utiliza um **PostgreSQL hospedado em nuvem** (provedor
+**Render**), com as credenciais fornecidas por variáveis de ambiente. A conexão foi
+**validada em execução**: a aplicação conectou-se ao PostgreSQL na nuvem (versão 18),
+criou o esquema automaticamente e persistiu/recuperou dados com sucesso, sem qualquer
+alteração no código — apenas a troca do perfil. Isso demonstra, na prática, os
+conceitos de **banco de dados em nuvem** e de **transparência de localização**: a
+aplicação não muda — apenas o endereço do banco — ao migrar do ambiente local para o
+ambiente em nuvem.
 
 ### 2.5 Segurança e Controle de Acesso
 
@@ -225,6 +228,11 @@ isolamento de acesso (um cliente não visualiza pedidos de outro — retorno 404
 atualização de status pelo empreendedor, e o retorno **409 Conflict** ao tentar
 remover um prato vinculado a um pedido existente.
 
+Por fim, a aplicação foi executada no perfil `prod` conectada ao **PostgreSQL
+hospedado no Render**, validando a persistência em nuvem: criação de um prato
+(HTTP 201) e posterior leitura (HTTP 200) confirmaram que os dados foram gravados e
+recuperados do banco remoto.
+
 ### 4.3 Ajustes realizados durante o desenvolvimento
 
 - **Serialização JSON:** a entidade `Pedido` referencia o `Usuario` cliente; para não
@@ -259,9 +267,10 @@ transparência, persistência e serviços em nuvem. Além do aprendizado técnic
 projeto evidencia como uma solução simples pode trazer organização e eficiência ao
 dia a dia de pequenos empreendedores.
 
-Como evolução futura, prevê-se: a efetivação do *deploy* do banco e da aplicação em
-nuvem, a integração com meios de pagamento, notificações ao cliente a cada mudança de
-status e a construção de um aplicativo móvel consumindo a mesma API.
+Como evolução futura, prevê-se: o *deploy* da própria aplicação em nuvem (o banco já
+está hospedado no Render), a integração com meios de pagamento, notificações ao
+cliente a cada mudança de status e a construção de um aplicativo móvel consumindo a
+mesma API.
 
 ## Agradecimentos
 
