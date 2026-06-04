@@ -89,11 +89,12 @@ Obrigado!"
 
 ## Parte 3 — Roteiro de demonstração (o que mostrar na tela)
 
-1. **Cardápio público:** abrir `/pratos` (sem login) — mostra que listar é público (RF01).
-2. **Cadastro/login de cliente:** criar conta em `/cadastro`, logar.
-3. **Fazer um pedido (RF02):** selecionar itens no cardápio e confirmar.
+1. **Vitrine de lojas:** abrir `/lojas` — mostra as várias lojas do marketplace; abrir uma loja exibe o cardápio dela (RF01).
+2. **Cadastro/login de cliente:** criar conta em `/cadastro`, logar (cai na vitrine de lojas).
+3. **Fazer um pedido (RF02):** escolher uma loja, selecionar itens e confirmar.
 4. **Acompanhamento:** mostrar a página de pedido com a **linha do tempo** de status.
-5. **Empreendedor (ADMIN):** logar como `admin@pratofacil.com` / `admin123`.
+5. **Empreendedor (ADMIN):** logar como um lojista, ex.: `maozinhaburger@pratofacil.com` / `burger123`
+   (cada loja tem login próprio — ver lista no README). Mostrar o **isolamento**: o lojista só vê o cardápio e os pedidos da sua loja.
 6. **Gerir status (RF03):** em `/admin/pedidos`, mudar o status do pedido e mostrar
    que o cliente vê a atualização.
 7. **Dashboard:** abrir `/admin/dashboard` (faturamento, pedidos, clientes, status).

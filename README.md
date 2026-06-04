@@ -5,7 +5,8 @@ aplicação **Java + Spring Boot 4** que ajuda pequenos empreendedores do ramo
 alimentício a gerenciar o ciclo de vida dos pedidos (cardápio, pedidos e status de
 entrega), aplicando na prática conceitos de sistemas distribuídos: arquitetura
 cliente-servidor, API REST, protocolo HTTP, middleware, transparência, persistência
-de dados e serviços em nuvem.
+de dados e serviços em nuvem. Funciona como um pequeno **marketplace**: cada loja
+tem seu próprio cardápio e o cliente escolhe em qual loja deseja pedir.
 
 ## Problemática
 
@@ -41,11 +42,20 @@ Cliente (Postman / navegador / app)  ->  HTTP  ->  API REST Spring Boot
      ->  Camada de Serviço (regras de negócio)  ->  Spring Data JPA  ->  Banco de Dados
 ```
 
-## Perfis e papéis
+## Perfis, papéis e lojas
 
 - **Perfis:** `dev` (H2 em memória, padrão) e `prod` (PostgreSQL em nuvem via variáveis de ambiente).
-- **Papéis:** `ADMIN` (empreendedor) e `CLIENTE` (cliente final, com conta). Senhas com hash BCrypt.
-- **Admin padrão** criado na primeira execução: **`admin@pratofacil.com`** / **`admin123`**.
+- **Papéis:** `ADMIN` (lojista, dono de uma loja) e `CLIENTE` (cliente final, com conta). Senhas com hash BCrypt.
+- **Marketplace:** o cliente entra na **vitrine de lojas** (`/lojas`) e escolhe onde pedir; cada lojista gerencia apenas a própria loja (cardápio, pedidos e dashboard).
+
+Lojas de exemplo criadas na primeira execução (cada uma com seu cardápio):
+
+| Loja | Login (ADMIN) | Senha |
+|---|---|---|
+| Comida de Vó | `comidadavo@pratofacil.com` | `vovo123` |
+| Mãozinha Burger | `maozinhaburger@pratofacil.com` | `burger123` |
+| Forno Italiano | `fornoitaliano@pratofacil.com` | `pizza123` |
+| Império do Açaí | `imperiodoacai@pratofacil.com` | `acai123` |
 
 ## Como executar
 
@@ -60,9 +70,9 @@ A aplicação sobe em `http://localhost:8080`.
 
 | Recurso | URL |
 |---|---|
-| Cardápio (cliente) | `http://localhost:8080/pratos` |
+| Vitrine de lojas (cliente) | `http://localhost:8080/lojas` |
 | Cadastro / Login | `http://localhost:8080/cadastro` · `/login` |
-| Painel do empreendedor | `http://localhost:8080/admin` |
+| Painel do lojista | `http://localhost:8080/admin` |
 | Dashboard | `http://localhost:8080/admin/dashboard` |
 | Swagger (documentação da API) | `http://localhost:8080/swagger-ui.html` |
 | Console H2 (perfil dev) | `http://localhost:8080/h2-console` |
@@ -103,8 +113,8 @@ Status possíveis: `EM_PREPARO`, `SAIU_PARA_ENTREGA`, `ENTREGUE`.
 ### Exemplos (cURL)
 
 ```bash
-# Cadastrar um prato (autenticado como ADMIN via HTTP Basic)
-curl -u admin@pratofacil.com:admin123 -X POST http://localhost:8080/api/pratos \
+# Cadastrar um prato na loja do lojista autenticado (HTTP Basic)
+curl -u comidadavo@pratofacil.com:vovo123 -X POST http://localhost:8080/api/pratos \
   -H "Content-Type: application/json" \
   -d '{"nome":"Feijoada","descricao":"Completa","preco":39.90}'
 
@@ -112,7 +122,7 @@ curl -u admin@pratofacil.com:admin123 -X POST http://localhost:8080/api/pratos \
 curl http://localhost:8080/api/pratos
 
 # Atualizar o status do pedido 1 (ADMIN)
-curl -u admin@pratofacil.com:admin123 \
+curl -u comidadavo@pratofacil.com:vovo123 \
   -X PUT "http://localhost:8080/api/pedidos/1/status?status=SAIU_PARA_ENTREGA"
 ```
 

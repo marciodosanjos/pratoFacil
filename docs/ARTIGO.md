@@ -62,7 +62,9 @@ gestão de pedidos desenvolvido como uma **API REST** em **Java/Spring Boot**,
 acompanhado de uma interface web. O objetivo é centralizar e organizar o ciclo de
 vida do pedido — do cadastro do cardápio até a entrega — em uma arquitetura
 distribuída e desacoplada, conectando a teoria estudada na disciplina de Sistemas
-Distribuídos a um problema real e observável.
+Distribuídos a um problema real e observável. O sistema é estruturado como um pequeno
+**marketplace**: cada loja (empreendedor) possui seu próprio cardápio, e o cliente,
+ao acessar a plataforma, escolhe em qual loja deseja realizar o pedido.
 
 O escopo foi deliberadamente **reduzido e bem trabalhado**, conforme orientação da
 avaliação, concentrando-se em três requisitos funcionais:
@@ -174,6 +176,15 @@ Cliente (navegador / Postman / app)  ->  HTTP  ->  API REST Spring Boot
 Decisão de projeto relevante: o **valor total do pedido é sempre calculado no
 servidor** a partir dos identificadores dos pratos enviados pelo cliente — o cliente
 nunca informa preços, evitando inconsistências e fraudes.
+
+**Modelo de marketplace (múltiplas lojas).** O domínio possui a entidade `Loja`:
+cada usuário `ADMIN` é dono de uma loja, e tanto os pratos quanto os pedidos são
+vinculados a uma loja. Ao entrar, o cliente vê a **vitrine de lojas** e escolhe onde
+pedir; cada lojista gerencia **apenas a própria loja** (cardápio, pedidos e
+indicadores). Esse isolamento por loja é uma forma simples de **multitenancy**, em
+que vários estabelecimentos compartilham a mesma aplicação e o mesmo banco, porém com
+os dados logicamente separados — reforçando a noção de serviços compartilhados típica
+de sistemas distribuídos.
 
 ### 3.3 Endpoints da API REST
 
