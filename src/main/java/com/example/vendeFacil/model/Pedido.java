@@ -10,7 +10,7 @@ public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String nome;
     private Double valorTotal;
 
@@ -20,16 +20,16 @@ public class Pedido {
             joinColumns = @JoinColumn(name = "pedido_id"),
             inverseJoinColumns = @JoinColumn(name = "cardapio_id")
     )
-    private List<Cardapio> cardapios = new ArrayList();
+    private List<Cardapio> cardapios = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
