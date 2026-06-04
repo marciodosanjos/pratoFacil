@@ -4,21 +4,21 @@
 
 <!-- Menu de navegação, ciente do login (anonimo / cliente / vendedor). -->
 <nav th:fragment="clienteNav"
-     style="display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap;
+     style="display:flex; gap:22px; align-items:center; justify-content:center; flex-wrap:wrap;
             padding:12px; margin-bottom:24px; background:#fff; border:1px solid #e1d6c6;
             border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 
-    <a th:href="@{/lojas}" style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🏪 Lojas</a>
+    <a th:href="@{/lojas}" style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">Lojas</a>
 
     <!-- Cliente logado -->
     <a th:if="${auth != null and auth.logado and !auth.admin}" th:href="@{/meus-pedidos}"
-       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🧾 Meus Pedidos</a>
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">Meus Pedidos</a>
     <a th:if="${auth != null and auth.logado and !auth.admin}" th:href="@{/perfil}"
-       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">👤 Perfil</a>
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">Perfil</a>
 
     <!-- Vendedor logado -->
     <a th:if="${auth != null and auth.logado and auth.admin}" th:href="@{/admin}"
-       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🛠️ Meu Painel</a>
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">Meu Painel</a>
 
     <!-- Logado: sair -->
     <form th:if="${auth != null and auth.logado}" th:action="@{/logout}" method="post" style="margin:0;">

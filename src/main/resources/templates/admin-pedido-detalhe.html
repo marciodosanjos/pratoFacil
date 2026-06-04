@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhe do Pedido - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px; max-width:620px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:18px; margin-bottom:24px; }
+        .header h1 { color:var(--dark); font-size:24px; margin:0; text-transform:uppercase; letter-spacing:2px; }
+        .card { background:#fff; border:1px solid #e1d6c6; border-radius:10px; padding:26px 24px; box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:20px; }
+        .info p { margin:4px 0; font-size:15px; }
+        .info strong { color:var(--muted); font-weight:bold; }
+        .secao { color:var(--dark); font-size:15px; border-left:4px solid var(--gold); padding-left:10px; margin:22px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+        .itens { list-style:none; padding:0; margin:0; }
+        .itens li { display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:10px 0; border-bottom:1px solid #f0e9df; font-size:15px; }
+        .itens small { color:var(--muted); font-size:12px; }
+        .total { display:flex; justify-content:space-between; font-size:18px; font-weight:bold; color:var(--dark); margin-top:14px; padding-top:12px; border-top:2px solid #e1d6c6; }
+        .status-badge { display:inline-block; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; }
+        .status-em_preparo { background:#fff9e6; color:#b89252; border:1px solid #ffe8b3; }
+        .status-saiu_para_entrega { background:#e6f0fc; color:#2155b8; border:1px solid #b3ccf0; }
+        .status-entregue { background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; }
+        .status-form { display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+        .status-form select { padding:9px; border:1px solid #e1d6c6; border-radius:5px; background:#fcfaf7; font-size:14px; }
+        .btn-update { padding:9px 16px; background:var(--gold); color:#fff; border:none; border-radius:5px; font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase; }
+        .btn-update:hover { background:#b89252; }
+        .acoes { text-align:center; }
+        .btn { display:inline-block; padding:11px 22px; border:1px solid var(--gold); color:var(--gold); background:transparent; border-radius:4px; text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:13px; }
+        .btn:hover { background:var(--gold); color:#fff; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Pedido #<span th:text="${pedido.id}">1</span></h1>
+</div>
+
+<div class="card">
+    <div class="info">
+        <p><strong>Cliente:</strong> <span th:text="${pedido.cliente != null ? pedido.cliente.nome : '—'}">—</span></p>
+        <p th:if="${pedido.cliente != null}"><strong>E-mail:</strong> <span th:text="${pedido.cliente.email}">—</span></p>
+        <p th:if="${pedido.dataFormatada != ''}"><strong>Recebido em:</strong> <span th:text="${pedido.dataFormatada}">—</span></p>
+        <p><strong>Itens:</strong> <span th:text="${pedido.totalUnidades}">0</span> unidade(s)</p>
+    </div>
+
+    <div class="secao">Itens do pedido</div>
+    <ul class="itens">
+        <li th:each="item : ${pedido.itens}">
+            <span>
+                <strong th:text="${item.quantidade} + 'x'">1x</strong>
+                <span th:text="${item.cardapio.nome}">Prato</span>
+                <small th:text="'(R$ ' + ${#numbers.formatDecimal(item.cardapio.preco,1,'POINT',2,'COMMA')} + ' cada)'">(R$ 0,00 cada)</small>
+            </span>
+            <span th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal,1,'POINT',2,'COMMA')}">R$ 0,00</span>
+        </li>
+    </ul>
+    <div class="total">
+        <span>Total</span>
+        <span th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')}">R$ 0,00</span>
+    </div>
+
+    <div class="secao">Status da entrega</div>
+    <span th:class="'status-badge ' +
+                    (${pedido.status.name() == 'EM_PREPARO'} ? 'status-em_preparo' : '') +
+                    (${pedido.status.name() == 'SAIU_PARA_ENTREGA'} ? 'status-saiu_para_entrega' : '') +
+                    (${pedido.status.name() == 'ENTREGUE'} ? 'status-entregue' : '')"
+          th:text="${pedido.status.descricao}">STATUS</span>
+
+    <form class="status-form" method="post" th:action="@{'/admin/pedidos/atualizar-status/' + ${pedido.id}}">
+        <select name="status">
+            <option th:each="s : ${statusList}" th:value="${s}" th:text="${s.descricao}" th:selected="${s == pedido.status}"></option>
+        </select>
+        <button type="submit" class="btn-update">Atualizar status</button>
+    </form>
+</div>
+
+<div class="acoes">
+    <a th:href="@{/admin/pedidos}" class="btn">Voltar aos pedidos</a>
+</div>
+
+</body>
+</html>

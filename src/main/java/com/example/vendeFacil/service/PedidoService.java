@@ -13,6 +13,7 @@ import com.example.vendeFacil.repository.CardapioRepository;
 import com.example.vendeFacil.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,17 @@ public class PedidoService {
         Pedido pedido = buscarPorId(id);
         if (cliente == null || pedido.getCliente() == null
                 || !pedido.getCliente().getId().equals(cliente.getId())) {
+            throw new RecursoNaoEncontradoException("Pedido não encontrado: " + id);
+        }
+        return pedido;
+    }
+
+    // Busca um pedido garantindo que ele pertence a loja informada
+    // (um lojista nunca acessa o pedido de outra loja).
+    public Pedido buscarDaLoja(Long id, Loja loja) {
+        Pedido pedido = buscarPorId(id);
+        if (loja == null || pedido.getLoja() == null
+                || !pedido.getLoja().getId().equals(loja.getId())) {
             throw new RecursoNaoEncontradoException("Pedido não encontrado: " + id);
         }
         return pedido;
@@ -99,6 +111,7 @@ public class PedidoService {
         pedido.setLoja(loja);
         String quem = (cliente != null && cliente.getNome() != null) ? cliente.getNome() : "Cliente";
         pedido.setNome("Pedido de " + quem);
+        pedido.setDataCriacao(LocalDateTime.now());
 
         return pedidoRepository.save(pedido);
     }

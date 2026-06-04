@@ -77,6 +77,17 @@ public class PedidoController {
         return mv;
     }
 
+    // Detalhe de um pedido recebido pela loja do empreendedor.
+    @GetMapping("/admin/pedidos/{id}")
+    public ModelAndView adminPedidoDetalhe(@PathVariable Long id,
+                                           @AuthenticationPrincipal UserDetails principal) {
+        Pedido pedido = service.buscarDaLoja(id, logado(principal).getLoja());
+        ModelAndView mv = new ModelAndView("admin-pedido-detalhe");
+        mv.addObject("pedido", pedido);
+        mv.addObject("statusList", Status.values());
+        return mv;
+    }
+
     @PostMapping("/admin/pedidos/atualizar-status/{id}")
     public String atualizarStatusPedido(@PathVariable("id") Long id,
                                         @RequestParam("status") Status novoStatus) {

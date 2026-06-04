@@ -3,6 +3,8 @@ package com.example.vendeFacil.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,8 @@ public class Pedido {
     @JoinColumn(name = "loja_id")
     @JsonIgnore
     private Loja loja;
+
+    private LocalDateTime dataCriacao;
 
     public Long getId() {
         return id;
@@ -89,5 +93,27 @@ public class Pedido {
 
     public void setLoja(Loja loja) {
         this.loja = loja;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    // Data/hora formatada para exibicao (vazio se nao houver).
+    public String getDataFormatada() {
+        return dataCriacao == null ? "" : dataCriacao.format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm"));
+    }
+
+    // Quantidade total de unidades no pedido (soma das quantidades dos itens).
+    public int getTotalUnidades() {
+        int t = 0;
+        for (ItemPedido i : itens) {
+            t += i.getQuantidade();
+        }
+        return t;
     }
 }
