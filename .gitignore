@@ -34,3 +34,7 @@ build/
 
 ### Banco H2 em arquivo (perfil dev) ###
 /data/
+
+### Fontes Markdown do pre-projeto/artigo (versionamos apenas os PDFs) ###
+docs/PRE-PROJETO.md
+docs/ARTIGO.md

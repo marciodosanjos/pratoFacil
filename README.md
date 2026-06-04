@@ -215,8 +215,8 @@ docs/                          # Artigo, guia de deploy e roteiro de apresentaç
 
 ## Documentação
 
-- [`docs/PRE-PROJETO.md`](docs/PRE-PROJETO.md) — pré-projeto (fase de descoberta) que originou o trabalho. Também em [PDF](docs/PRE-PROJETO.pdf).
-- [`docs/ARTIGO.md`](docs/ARTIGO.md) — artigo (relatório final) da disciplina. Também em [PDF](docs/ARTIGO.pdf).
+- [`docs/PRE-PROJETO.pdf`](docs/PRE-PROJETO.pdf) — pré-projeto (fase de descoberta) que originou o trabalho.
+- [`docs/ARTIGO.pdf`](docs/ARTIGO.pdf) — artigo (relatório final) da disciplina.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — guia de deploy no Render.
 - [`docs/APRESENTACAO.md`](docs/APRESENTACAO.md) — roteiro da apresentação.
 - [`docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf`](docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf) — enunciado oficial da avaliação.
