@@ -33,6 +33,8 @@
 
 <div class="msg msg-ok" th:if="${param.ok}">Perfil atualizado com sucesso.</div>
 <div class="msg msg-erro" th:if="${param.erro}">Não foi possível salvar. Verifique os dados.</div>
+<div class="msg msg-ok" th:if="${param.metodoOk}">Método de pagamento adicionado.</div>
+<div class="msg msg-erro" th:if="${param.erroMetodo}">Não foi possível adicionar o método.</div>
 
 <div class="card">
     <form th:action="@{/perfil}" method="post">
@@ -48,6 +50,39 @@
         <div class="hint">Preencha apenas se quiser trocar a senha (mínimo 4 caracteres).</div>
 
         <button type="submit" class="btn">Salvar alterações</button>
+    </form>
+</div>
+
+<div class="card" style="margin-top:20px;">
+    <h2 style="font-size:18px; color:#0c0b09; margin:0 0 16px; text-transform:uppercase; letter-spacing:1px;">Métodos de pagamento</h2>
+
+    <div th:if="${#lists.isEmpty(metodos)}" style="color:#7a6a60; font-style:italic; font-size:14px; margin-bottom:16px;">
+        Nenhum método cadastrado.
+    </div>
+    <ul th:unless="${#lists.isEmpty(metodos)}" style="list-style:none; padding:0; margin:0 0 18px;">
+        <li th:each="m : ${metodos}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0e9df;">
+            <span>
+                <strong th:text="${m.tipo.descricao}">Tipo</strong>
+                <span th:if="${m.descricao != null and m.descricao != m.tipo.descricao}" th:text="'— ' + ${m.descricao}" style="color:#7a6a60; font-size:14px;"></span>
+            </span>
+            <form th:action="@{'/perfil/metodo/' + ${m.id} + '/excluir'}" method="post" style="margin:0;">
+                <button type="submit" style="background:none; border:none; color:#d9534f; cursor:pointer; font-weight:bold; font-size:13px;">Excluir</button>
+            </form>
+        </li>
+    </ul>
+
+    <form th:action="@{/perfil/metodo}" method="post" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:1; min-width:140px;">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo" required style="width:100%; padding:11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
+                <option th:each="t : ${tiposPagamento}" th:value="${t}" th:text="${t.descricao}">Tipo</option>
+            </select>
+        </div>
+        <div style="flex:2; min-width:160px;">
+            <label for="descricao">Apelido (opcional)</label>
+            <input type="text" id="descricao" name="descricao" placeholder="ex: Cartão final 1234" style="width:100%; padding:11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
+        </div>
+        <button type="submit" class="btn" style="width:auto; padding:12px 20px;">Adicionar</button>
     </form>
 </div>
 
