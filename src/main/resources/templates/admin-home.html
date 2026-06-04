@@ -121,7 +121,7 @@
 
 <div class="header">
     <img th:if="${loja != null}" th:src="@{'/lojas/' + ${loja.id} + '/logo'}" alt="logo"
-         style="width:84px;height:84px;border-radius:12px;object-fit:cover;border:2px solid #cda45e;margin-bottom:12px;"
+         style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #cda45e;margin-bottom:12px;"
          onerror="this.style.display='none'">
     <h1>Painel de Controle</h1>
     <p th:text="${nomeLoja != null and !nomeLoja.isEmpty()} ? 'Loja: ' + ${nomeLoja} : 'Bem-vindo ao ambiente de gestão do PratoFácil'">Bem-vindo ao ambiente de gestão do PratoFácil</p>

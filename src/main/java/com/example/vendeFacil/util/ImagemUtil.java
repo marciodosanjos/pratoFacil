@@ -1,7 +1,6 @@
 package com.example.vendeFacil.util;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -9,13 +8,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-// Utilitario para padronizar a logo da loja no formato "iFood": um quadrado
-// de 400x400 pixels. A imagem e redimensionada preservando a proporcao (sem
-// cortar) e as bordas sao preenchidas com a cor de fundo do app.
+// Utilitario para padronizar a logo da loja num quadrado de 400x400 pixels.
+// Faz um recorte central (cover): a imagem PREENCHE todo o quadrado, mantendo
+// a proporcao (as sobras das bordas mais longas sao cortadas). Como as telas
+// exibem a logo em uma moldura redonda, o resultado fica preenchido no circulo.
 public final class ImagemUtil {
 
     private static final int TAMANHO = 400;
-    private static final Color FUNDO = new Color(0xFA, 0xF6, 0xF0); // cor "cream" do app
 
     private ImagemUtil() {
     }
@@ -30,20 +29,17 @@ public final class ImagemUtil {
                 throw new IllegalArgumentException("Arquivo de imagem inválido");
             }
 
-            double escala = Math.min((double) TAMANHO / img.getWidth(),
-                                     (double) TAMANHO / img.getHeight());
-            int novaLargura = Math.max(1, (int) Math.round(img.getWidth() * escala));
-            int novaAltura = Math.max(1, (int) Math.round(img.getHeight() * escala));
-            int x = (TAMANHO - novaLargura) / 2;
-            int y = (TAMANHO - novaAltura) / 2;
+            // Maior quadrado central possivel da imagem original.
+            int lado = Math.min(img.getWidth(), img.getHeight());
+            int sx = (img.getWidth() - lado) / 2;
+            int sy = (img.getHeight() - lado) / 2;
 
             BufferedImage canvas = new BufferedImage(TAMANHO, TAMANHO, BufferedImage.TYPE_INT_RGB);
             Graphics2D g = canvas.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setColor(FUNDO);
-            g.fillRect(0, 0, TAMANHO, TAMANHO);
-            g.drawImage(img, x, y, novaLargura, novaAltura, null);
+            // Recorte central da origem escalado para 400x400 (preenche tudo).
+            g.drawImage(img, 0, 0, TAMANHO, TAMANHO, sx, sy, sx + lado, sy + lado, null);
             g.dispose();
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -15,8 +15,9 @@
         input[type=text], input[type=email], input[type=password] { width:100%; padding:12px; margin-bottom:18px; border:1px solid #e1d6c6; border-radius:6px; font-size:15px; background:#fcfaf7; }
         input:focus { outline:none; border-color:var(--gold); }
         .logo-area { text-align:center; margin-bottom:22px; }
-        .logo-preview { width:140px; height:140px; border-radius:14px; object-fit:cover; border:2px solid #e1d6c6; background:var(--cream); display:inline-block; }
-        .logo-area input[type=file] { display:block; margin:12px auto 4px; font-size:13px; }
+        .logo-preview { width:150px; height:150px; border-radius:50%; object-fit:cover; border:3px solid #e1d6c6; background:var(--cream); display:inline-block; }
+        .btn-upload { display:inline-block; margin:14px auto 4px; padding:10px 20px; background:#fff; color:var(--gold); border:1px solid var(--gold); border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; }
+        .btn-upload:hover { background:var(--gold); color:#fff; }
         .hint { font-size:12px; color:var(--muted); margin:-12px 0 18px; }
         .btn { width:100%; padding:13px; border:none; border-radius:6px; background:var(--gold); color:#fff; font-size:15px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; cursor:pointer; }
         .btn:hover { background:#b89252; }
@@ -39,12 +40,14 @@
     <form th:action="@{/admin/perfil}" method="post" enctype="multipart/form-data">
 
         <div class="logo-area">
-            <label>Logo da loja (400 x 400)</label>
+            <label>Logo da loja</label><br>
             <img id="preview" class="logo-preview" alt="logo"
                  th:src="@{'/lojas/' + ${loja.id} + '/logo'}"
-                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22><rect width=%22140%22 height=%22140%22 fill=%22%23faf6f0%22/><text x=%2270%22 y=%2275%22 font-size=%2230%22 text-anchor=%22middle%22>🏪</text></svg>'">
-            <input type="file" name="logo" accept="image/*" onchange="previewLogo(this)">
-            <div class="hint">Envie uma imagem (PNG ou JPG). Ela será ajustada automaticamente para 400x400.</div>
+                 onerror="this.style.visibility='hidden'"><br>
+            <input type="file" id="logoInput" name="logo" accept="image/*" onchange="previewLogo(this)" style="display:none;">
+            <label for="logoInput" class="btn-upload">📷 Escolher imagem</label>
+            <div id="nomeArquivo" class="hint">Nenhuma imagem selecionada</div>
+            <div class="hint">PNG ou JPG. A imagem entra numa moldura redonda (recorte central).</div>
         </div>
 
         <label for="nomeLoja">Nome do restaurante</label>
@@ -66,9 +69,15 @@
 <script>
     function previewLogo(input) {
         if (input.files && input.files[0]) {
+            const arquivo = input.files[0];
+            document.getElementById('nomeArquivo').textContent = arquivo.name;
             const reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('preview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+            reader.onload = function (e) {
+                const img = document.getElementById('preview');
+                img.src = e.target.result;
+                img.style.visibility = 'visible';
+            };
+            reader.readAsDataURL(arquivo);
         }
     }
 </script>
