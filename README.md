@@ -63,6 +63,10 @@ Lojas de exemplo criadas na primeira execução (cada uma com seu cardápio):
 | Forno Italiano | `fornoitaliano@pratofacil.com` | `pizza123` |
 | Império do Açaí | `imperiodoacai@pratofacil.com` | `acai123` |
 
+> **Cliente:** não há cliente pré-cadastrado. Crie uma conta em `/cadastro`
+> (escolha **Cliente**) para testar o fluxo de pedido e pagamento. Não é preciso
+> nenhuma chave para rodar localmente — sem o Asaas, o pagamento opera em modo simulação.
+
 ## Pagamentos (PIX e cartão)
 
 Ao finalizar o pedido, o cliente é levado a uma **tela de pagamento** com duas opções:
@@ -100,6 +104,9 @@ A aplicação sobe em `http://localhost:8080`.
 | Dashboard | `http://localhost:8080/admin/dashboard` |
 | Swagger (documentação da API) | `http://localhost:8080/swagger-ui.html` |
 | Console H2 (perfil dev) | `http://localhost:8080/h2-console` |
+
+> No console H2, use **JDBC URL** `jdbc:h2:file:./data/pratofacildb`, usuário `sa` e
+> senha em branco.
 
 Para testar o **PIX real** localmente, rode com a chave do Asaas (sandbox):
 
