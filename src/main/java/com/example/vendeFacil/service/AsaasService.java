@@ -58,7 +58,21 @@ public class AsaasService {
         return new Cobranca((String) resp.get("id"), (String) resp.get("invoiceUrl"), (String) resp.get("status"));
     }
 
+    // Busca o QR Code PIX de uma cobrança: imagem (base64) + código copia-e-cola.
+    public PixQrCode obterPixQrCode(String paymentId) {
+        Map<?, ?> resp = client.get().uri("/payments/{id}/pixQrCode", paymentId)
+                .retrieve().body(Map.class);
+        if (resp == null) {
+            return null;
+        }
+        return new PixQrCode((String) resp.get("encodedImage"), (String) resp.get("payload"));
+    }
+
     // Resultado de uma cobrança: id do pagamento, link de pagamento e status.
     public record Cobranca(String id, String invoiceUrl, String status) {
+    }
+
+    // QR Code PIX: imagem em base64 (PNG) e o payload "copia e cola".
+    public record PixQrCode(String encodedImage, String payload) {
     }
 }

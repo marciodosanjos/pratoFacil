@@ -73,6 +73,17 @@ public class PedidoController {
         return mv;
     }
 
+    // Tela de pagamento PIX do pedido (QR Code + copia-e-cola), dentro do app.
+    @GetMapping("/meus-pedidos/{id}/pagamento")
+    public ModelAndView pagamento(@PathVariable Long id,
+                                  @AuthenticationPrincipal UserDetails principal) {
+        Pedido pedido = service.buscarDoCliente(id, logado(principal));
+        ModelAndView mv = new ModelAndView("pagamento");
+        mv.addObject("pedido", pedido);
+        mv.addObject("pix", pagamentoService.obterPix(pedido));
+        return mv;
+    }
+
     // Área do empreendedor: pedidos recebidos pela SUA loja + gestão de status (RF03).
     @GetMapping("/admin/pedidos")
     public ModelAndView adminPedidos(@AuthenticationPrincipal UserDetails principal) {

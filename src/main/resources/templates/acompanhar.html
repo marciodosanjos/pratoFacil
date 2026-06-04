@@ -69,10 +69,10 @@
           style="display:inline-block; padding:8px 16px; border-radius:6px; background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; font-weight:bold;">Pago</span>
     <div th:if="${pedido.statusPagamento.name() == 'PENDENTE'}">
         <span style="display:inline-block; padding:8px 16px; border-radius:6px; background:#fff9e6; color:#b89252; border:1px solid #ffe8b3; font-weight:bold;">Aguardando pagamento</span>
-        <div th:if="${pedido.pagamentoUrl != null}" style="margin-top:14px;">
-            <a th:href="${pedido.pagamentoUrl}" target="_blank"
+        <div style="margin-top:14px;">
+            <a th:href="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento'}"
                style="display:inline-block; padding:13px 26px; background:#cda45e; color:#fff; border-radius:6px; text-decoration:none; font-weight:bold; text-transform:uppercase; letter-spacing:.5px;">Pagar agora (PIX)</a>
-            <p style="font-size:12px; color:#7a6a60; margin-top:10px;">Abre a página de pagamento. Após pagar, o status atualiza sozinho.</p>
+            <p style="font-size:12px; color:#7a6a60; margin-top:10px;">Mostra o QR Code do PIX. Após pagar, o status atualiza sozinho.</p>
         </div>
     </div>
 </div>

@@ -51,6 +51,21 @@ public class PagamentoService {
         }
     }
 
+    // Busca o QR Code PIX para exibir na tela de pagamento do app.
+    // Só faz sentido se há cobrança ativa (pendente) e o gateway está configurado.
+    public AsaasService.PixQrCode obterPix(Pedido pedido) {
+        if (!asaas.isConfigurado() || pedido == null
+                || pedido.getAsaasPaymentId() == null || pedido.getAsaasPaymentId().isBlank()
+                || pedido.getStatusPagamento() != StatusPagamento.PENDENTE) {
+            return null;
+        }
+        try {
+            return asaas.obterPixQrCode(pedido.getAsaasPaymentId());
+        } catch (Exception e) {
+            return null; // sem QR: a tela cai no link externo de pagamento
+        }
+    }
+
     // Confirma o pagamento de um pedido a partir do id da cobrança (via webhook).
     public void confirmarPagamento(String asaasPaymentId) {
         if (asaasPaymentId == null) {
