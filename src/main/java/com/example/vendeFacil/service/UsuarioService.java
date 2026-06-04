@@ -64,4 +64,9 @@ public class UsuarioService implements UserDetailsService {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado: " + email));
     }
+
+    // Quantidade de clientes cadastrados (para o dashboard).
+    public long contarClientes() {
+        return repository.countByRole(Role.CLIENTE);
+    }
 }
