@@ -215,6 +215,7 @@ docs/                          # Artigo, guia de deploy e roteiro de apresentaç
 
 ## Documentação
 
+- [`docs/PRE-PROJETO.md`](docs/PRE-PROJETO.md) — pré-projeto (fase de descoberta) que originou o trabalho.
 - [`docs/ARTIGO.md`](docs/ARTIGO.md) — artigo (relatório final) da disciplina.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — guia de deploy no Render.
 - [`docs/APRESENTACAO.md`](docs/APRESENTACAO.md) — roteiro da apresentação.
