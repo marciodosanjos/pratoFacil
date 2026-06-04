@@ -243,4 +243,33 @@ docs/                          # Artigo, guia de deploy e roteiro de apresentaç
 
 ## Integrantes
 
-- *(preencher com os nomes do grupo)*
+
+Nome - RA
+
+1 - Antônio Henrique Torres Silva - 62612969
+
+2 - Bianca Rodrigues dos Santos - 825153938
+
+3 - Breno Gabriel da Silva - 942523034
+
+4 - Caio Rafael da Encarnação Freitas - 12724239863
+
+5 - Carlos Daniel Batista - 722422327
+
+6 - Enzo Marinho Machado Vieira - 12625125047
+
+7 - Felipe Barbosa da Silva - 824226505
+
+8 - Kleyber Daniel Maia Barreto Noronha - 12822115159
+
+9 - Márcio dos Anjos - 825111033
+
+10 - Matheus de Paula Vieira - 942421782
+
+11 - Natan Vigil de Azambuja - 12923113102
+
+12 - Pedro Henrique Ferreira da Silva - 1262510629
+
+13 - Thayane Moura Silva - 825117617
+
+
