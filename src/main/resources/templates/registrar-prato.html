@@ -61,6 +61,7 @@
 
         .form-group input[type="text"],
         .form-group input[type="number"],
+        .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 12px;
@@ -144,6 +145,14 @@
         <div class="form-group">
             <label th:for="preco">Preço (R$)</label>
             <input type="number" step="0.01" th:field="*{preco}" placeholder="Ex: 49.90" required />
+        </div>
+
+        <div class="form-group">
+            <label th:for="categoria">Categoria</label>
+            <select th:field="*{categoria}" required>
+                <option value="" disabled selected>Selecione a categoria</option>
+                <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat.descricao}">Categoria</option>
+            </select>
         </div>
 
         <button type="submit" class="btn-submit">Cadastrar no Cardápio</button>

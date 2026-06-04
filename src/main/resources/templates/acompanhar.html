@@ -44,9 +44,9 @@
     </div>
 
     <ul class="itens">
-        <li th:each="item : ${pedido.cardapios}">
-            <span th:text="${item.nome}">Item</span>
-            <span th:text="${item.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(item.preco,1,'POINT',2,'COMMA')} : ''">R$ 0,00</span>
+        <li th:each="item : ${pedido.itens}">
+            <span><span th:text="${item.quantidade}">1</span>x&nbsp;<span th:text="${item.cardapio.nome}">Item</span></span>
+            <span th:text="'R$ ' + ${#numbers.formatDecimal(item.subtotal,1,'POINT',2,'COMMA')}">R$ 0,00</span>
         </li>
     </ul>
 

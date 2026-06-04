@@ -39,9 +39,10 @@
         <thead>
         <tr>
             <th style="width: 8%;">ID</th>
-            <th style="width: 25%;">Nome</th>
-            <th style="width: 37%;">Descrição</th>
-            <th style="width: 15%;">Preço</th>
+            <th style="width: 22%;">Nome</th>
+            <th style="width: 28%;">Descrição</th>
+            <th style="width: 15%;">Categoria</th>
+            <th style="width: 12%;">Preço</th>
             <th style="width: 15%;">Ações</th>
         </tr>
         </thead>
@@ -50,6 +51,7 @@
             <td th:text="${item.id}">1</td>
             <td th:text="${item.nome}" style="font-weight: 500;">Nome do Prato</td>
             <td th:text="${item.descricao}" style="color: #7a6a60; font-size: 14px;">Descrição do prato...</td>
+            <td th:text="${item.categoria != null ? item.categoria.descricao : '—'}" style="font-size: 13px; color: #7a6a60;">Categoria</td>
             <td class="price" th:text="${item.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 0,00</td>
             <td>
                 <div class="actions-group">

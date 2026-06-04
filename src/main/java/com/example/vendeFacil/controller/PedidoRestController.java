@@ -1,5 +1,6 @@
 package com.example.vendeFacil.controller;
 
+import com.example.vendeFacil.dto.PedidoRequest;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
 import com.example.vendeFacil.model.Usuario;
@@ -42,10 +43,10 @@ public class PedidoRestController {
     // RF02 - o cliente realiza um pedido (POST), vinculado ao usuário autenticado.
     // O valor total é calculado no servidor a partir dos pratos enviados.
     @PostMapping
-    public ResponseEntity<Pedido> criar(@RequestBody Pedido pedido,
+    public ResponseEntity<Pedido> criar(@RequestBody PedidoRequest request,
                                         @AuthenticationPrincipal UserDetails principal) {
         Usuario cliente = usuarioService.buscarPorEmail(principal.getUsername());
-        Pedido salvo = service.criar(pedido, cliente);
+        Pedido salvo = service.criar(request, cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 

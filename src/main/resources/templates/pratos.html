@@ -3,214 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Digital</title>
+    <title>Cardápio - PratoFácil</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #3e322d;
-            background-color: #faf6f0;
-            margin: 0;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: 0 auto;
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px 110px; max-width:800px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:20px; margin-bottom:20px; }
+        .header h1 { color:var(--dark); font-size:28px; margin:0 0 10px; text-transform:uppercase; letter-spacing:2px; }
+        .header p { color:var(--gold); font-style:italic; margin:0; }
+        .voltar { display:inline-block; margin-bottom:18px; color:var(--gold); text-decoration:none; font-weight:bold; font-size:14px; }
+        .aviso { background:#fff9e6; color:#b89252; border:1px solid #ffe8b3; padding:12px 16px; border-radius:6px; text-align:center; margin-bottom:20px; font-size:14px; }
+        .section-title { color:var(--dark); font-size:18px; border-left:4px solid var(--gold); padding-left:12px; margin:26px 0 14px; text-transform:uppercase; letter-spacing:1px; }
+        .item { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid #e1d6c6; }
+        .item-info { flex:1; }
+        .item-info h3 { margin:0 0 5px; font-size:17px; color:var(--dark); }
+        .item-info p { margin:0; font-size:13px; color:var(--muted); }
+        .item-right { text-align:right; white-space:nowrap; }
+        .price { display:block; font-weight:bold; color:var(--gold); font-size:16px; margin-bottom:8px; }
+        .stepper { display:inline-flex; align-items:center; gap:10px; }
+        .stepper button { width:32px; height:32px; border:1px solid var(--gold); background:#fff; color:var(--gold); border-radius:50%; font-size:18px; font-weight:bold; cursor:pointer; line-height:1; }
+        .stepper button:hover { background:var(--gold); color:#fff; }
+        .stepper .qty { min-width:20px; text-align:center; font-weight:bold; font-size:16px; color:var(--dark); }
+        .no-items { text-align:center; padding:30px; color:var(--muted); font-style:italic; border:1px dashed #e1d6c6; background:#fcfaf7; border-radius:4px; }
+        .cartbar {
+            position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid #e1d6c6;
+            box-shadow:0 -3px 14px rgba(0,0,0,0.08); padding:14px 20px;
+            display:flex; justify-content:space-between; align-items:center; gap:14px;
         }
-
-        .header {
-            text-align: center;
-            border-bottom: 2px dashed #cda45e;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #0c0b09;
-            font-size: 28px;
-            margin: 0 0 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .header p {
-            color: #cda45e;
-            font-style: italic;
-            margin: 0;
-            font-size: 16px;
-        }
-
-        .section-title {
-            color: #0c0b09;
-            font-size: 20px;
-            border-left: 4px solid #cda45e;
-            padding-left: 12px;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .menu-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .menu-table td {
-            padding: 15px 0;
-            vertical-align: top;
-            border-bottom: 1px solid #e1d6c6;
-        }
-
-        .item-details {
-            width: 65%;
-            padding-right: 20px;
-        }
-
-        .item-name {
-            font-weight: bold;
-            font-size: 18px;
-            color: #0c0b09;
-            margin: 0 0 6px 0;
-        }
-
-        .item-description {
-            font-size: 14px;
-            color: #7a6a60;
-            margin: 0;
-        }
-
-        .item-actions {
-            width: 35%;
-            text-align: right;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .item-price {
-            font-weight: bold;
-            font-size: 18px;
-            color: #cda45e;
-            margin-right: 15px;
-            display: inline-block;
-        }
-
-        /* Controle de quantidade robusto */
-        .quantity-control {
-            width: 60px;
-            padding: 8px;
-            border: 1px solid #cda45e;
-            border-radius: 4px;
-            background-color: #ffffff;
-            font-size: 16px;
-            color: #3e322d;
-            text-align: center;
-        }
-
-        .aviso {
-            background:#fff9e6; color:#b89252; border:1px solid #ffe8b3;
-            padding:12px 16px; border-radius:6px; text-align:center; margin-bottom:20px; font-size:14px;
-        }
-        .add-label {
-            display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#7a6a60;
-            cursor:pointer; user-select:none;
-        }
-        .add-label input { width:18px; height:18px; accent-color:#cda45e; cursor:pointer; }
-
-        .no-items {
-            text-align: center;
-            padding: 30px;
-            color: #7a6a60;
-            font-style: italic;
-            border: 1px dashed #e1d6c6;
-            background-color: #fcfaf7;
-            border-radius: 4px;
-            margin-bottom: 30px;
-        }
-
-        /* Botão Confirmar Pedido */
-        .btn-confirmar {
-            display: block;
-            width: 100%;
-            max-width: 300px;
-            margin: 40px auto 20px auto;
-            padding: 15px 30px;
-            background-color: #cda45e;
-            color: #ffffff;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(205, 164, 94, 0.3);
-        }
-
-        .btn-confirmar:hover {
-            background-color: #b89252;
-        }
-
-        .btn-confirmar:active {
-            transform: scale(0.98);
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            font-size: 13px;
-            color: #a08f85;
-            border-top: 1px solid #e1d6c6;
-            padding-top: 20px;
-        }
+        .cartbar .cart-info { display:flex; flex-direction:column; line-height:1.3; }
+        .cartbar #cart-count { font-size:13px; color:var(--muted); }
+        .cartbar #cart-total { font-size:20px; color:var(--dark); }
+        .cartbar button { padding:13px 22px; background:var(--gold); color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:bold; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; }
+        .cartbar button:disabled { background:#d8cbb6; cursor:not-allowed; }
+        .cartbar button:not(:disabled):hover { background:#b89252; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1 th:text="${loja != null} ? ${loja.nome} : 'Cardápio'">Nosso Cardápio</h1>
-    <p th:text="${loja != null and loja.descricao != null and !loja.descricao.isEmpty()} ? ${loja.descricao} : 'Escolha os itens desejados e monte o seu pedido'">Escolha os itens desejados e monte o seu pedido</p>
+    <h1 th:text="${loja != null} ? ${loja.nome} : 'Cardápio'">Cardápio</h1>
+    <p th:text="${loja != null and loja.descricao != null and !loja.descricao.isEmpty()} ? ${loja.descricao} : 'Monte o seu pedido'">Monte o seu pedido</p>
 </div>
 
-<div style="margin-bottom:18px;">
-    <a th:href="@{/lojas}" style="color:#cda45e;text-decoration:none;font-weight:bold;font-size:14px;">← Ver outras lojas</a>
+<a th:href="@{/lojas}" class="voltar">← Ver outras lojas</a>
+
+<div class="aviso" th:if="${param.vazio}">Selecione ao menos um item (use o + para adicionar).</div>
+
+<div class="no-items" th:if="${porCategoria == null or porCategoria.isEmpty()}">
+    Nenhum prato disponível nesta loja no momento.
 </div>
 
-<div class="aviso" th:if="${param.vazio}">Selecione ao menos um item para confirmar o pedido.</div>
+<div th:each="entry : ${porCategoria}">
+    <div class="section-title" th:text="${entry.key.descricao}">Categoria</div>
+    <div class="item" th:each="c : ${entry.value}"
+         th:attr="data-id=${c.id},data-preco=${c.preco}">
+        <div class="item-info">
+            <h3 th:text="${c.nome}">Nome do prato</h3>
+            <p th:text="${c.descricao}">Descrição</p>
+        </div>
+        <div class="item-right">
+            <span class="price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco,1,'POINT',2,'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
+            <div class="stepper">
+                <button type="button" onclick="alterar(this,-1)">−</button>
+                <span class="qty">0</span>
+                <button type="button" onclick="alterar(this,1)">+</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="section-title">Pratos Principais</div>
+<div class="cartbar">
+    <div class="cart-info">
+        <span id="cart-count">Carrinho vazio</span>
+        <strong id="cart-total">R$ 0,00</strong>
+    </div>
+    <button type="button" id="cart-btn" disabled onclick="finalizar()">Finalizar pedido</button>
+</div>
 
-<form th:action="@{/novo-pedido}" method="POST" th:if="${!#lists.isEmpty(pratos)}">
-
-    <input type="hidden" name="lojaId" th:if="${loja != null}" th:value="${loja.id}" />
-
-    <table class="menu-table">
-        <tr th:each="c, iterStat : ${pratos}">
-            <td class="item-details">
-                <h3 class="item-name" th:text="${c.nome}">Nome do Prato</h3>
-                <p class="item-description" th:text="${c.descricao}">Descrição detalhada do prato.</p>
-            </td>
-            <td class="item-actions">
-                <span class="item-price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 45,00</span>
-
-                <label class="add-label">
-                    <input type="checkbox" th:name="|cardapios[${iterStat.index}].id|" th:value="${c.id}" />
-                    Adicionar
-                </label>
-            </td>
-        </tr>
-    </table>
-
-    <button type="submit" class="btn-confirmar">Confirmar Pedido</button>
+<form id="pedidoForm" th:action="@{/novo-pedido}" method="post" style="display:none;">
+    <input type="hidden" name="lojaId" th:if="${loja != null}" th:value="${loja.id}">
 </form>
 
-<div class="no-items" th:if="${#lists.isEmpty(pratos)}">
-    Nenhum prato disponível no momento.
-</div>
+<script>
+    const precos = {};
+    const carrinho = {};
 
-<div class="footer">
-    <p>Obrigado pela preferência! • Todos os direitos reservados</p>
-</div>
+    document.querySelectorAll('.item').forEach(function (el) {
+        const id = el.dataset.id;
+        precos[id] = parseFloat(el.dataset.preco) || 0;
+        carrinho[id] = 0;
+    });
+
+    function alterar(btn, delta) {
+        const item = btn.closest('.item');
+        const id = item.dataset.id;
+        carrinho[id] = Math.max(0, (carrinho[id] || 0) + delta);
+        item.querySelector('.qty').textContent = carrinho[id];
+        render();
+    }
+
+    function render() {
+        let count = 0, total = 0;
+        for (const id in carrinho) {
+            count += carrinho[id];
+            total += carrinho[id] * precos[id];
+        }
+        document.getElementById('cart-count').textContent =
+            count === 0 ? 'Carrinho vazio' : (count === 1 ? '1 item' : count + ' itens');
+        document.getElementById('cart-total').textContent =
+            'R$ ' + total.toFixed(2).replace('.', ',');
+        document.getElementById('cart-btn').disabled = count === 0;
+    }
+
+    function finalizar() {
+        const form = document.getElementById('pedidoForm');
+        form.querySelectorAll('.item-input').forEach(function (e) { e.remove(); });
+        let i = 0;
+        for (const id in carrinho) {
+            if (carrinho[id] > 0) {
+                form.appendChild(campo('itens[' + i + '].cardapioId', id));
+                form.appendChild(campo('itens[' + i + '].quantidade', carrinho[id]));
+                i++;
+            }
+        }
+        if (i === 0) { return; }
+        form.submit();
+    }
+
+    function campo(nome, valor) {
+        const inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = nome;
+        inp.value = valor;
+        inp.className = 'item-input';
+        return inp;
+    }
+
+    render();
+</script>
 
 </body>
 </html>

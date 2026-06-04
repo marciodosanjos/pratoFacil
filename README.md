@@ -6,7 +6,9 @@ alimentício a gerenciar o ciclo de vida dos pedidos (cardápio, pedidos e statu
 entrega), aplicando na prática conceitos de sistemas distribuídos: arquitetura
 cliente-servidor, API REST, protocolo HTTP, middleware, transparência, persistência
 de dados e serviços em nuvem. Funciona como um pequeno **marketplace**: cada loja
-tem seu próprio cardápio e o cliente escolhe em qual loja deseja pedir.
+tem seu próprio cardápio e o cliente escolhe em qual loja deseja pedir. O cardápio é
+organizado por **categorias** e o pedido é montado em um **carrinho**, com seletor de
+**quantidade** por item.
 
 ## Problemática
 

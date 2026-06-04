@@ -15,13 +15,10 @@ public class Pedido {
     private String nome;
     private Double valorTotal;
 
-    @ManyToMany
-    @JoinTable(
-            name = "pedido_itens",
-            joinColumns = @JoinColumn(name = "pedido_id"),
-            inverseJoinColumns = @JoinColumn(name = "cardapio_id")
-    )
-    private List<Cardapio> cardapios = new ArrayList<>();
+    // Itens do pedido (cada um com a sua quantidade).
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "pedido_id")
+    private List<ItemPedido> itens = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -62,12 +59,12 @@ public class Pedido {
         this.valorTotal = valorTotal;
     }
 
-    public List<Cardapio> getCardapios() {
-        return cardapios;
+    public List<ItemPedido> getItens() {
+        return itens;
     }
 
-    public void setCardapios(List<Cardapio> cardapios) {
-        this.cardapios = cardapios;
+    public void setItens(List<ItemPedido> itens) {
+        this.itens = itens;
     }
 
     public Status getStatus() {

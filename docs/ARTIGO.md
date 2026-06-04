@@ -207,10 +207,13 @@ A documentação interativa fica disponível em `/swagger-ui.html` (contrato Ope
 
 ### 3.4 Interface Web
 
-Além da API, o sistema possui páginas Thymeleaf responsivas: cardápio com seleção de
-itens, cadastro/login de cliente, **acompanhamento do pedido com linha do tempo de
-status**, painel do empreendedor com gestão de status e um **dashboard** com
-indicadores (faturamento, pedidos, clientes e contagem por status).
+Além da API, o sistema possui páginas Thymeleaf responsivas: cardápio **organizado
+por categorias**, com **seletor de quantidade (+/−)** e **carrinho** (total calculado
+ao vivo); cadastro/login de cliente; **acompanhamento do pedido com linha do tempo de
+status**; painel do empreendedor com gestão de status; e um **dashboard** com
+indicadores (faturamento, pedidos, clientes e contagem por status). Cada item do
+pedido guarda a sua quantidade (entidade `ItemPedido`), e o valor total considera
+preço × quantidade.
 
 ## 4. Documentação de Testes
 

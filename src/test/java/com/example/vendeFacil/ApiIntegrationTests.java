@@ -113,12 +113,13 @@ class ApiIntegrationTests {
         prato.setLoja(loja);
         prato = cardapioRepository.save(prato);
 
-        String body = "{\"cardapios\":[{\"id\":" + prato.getId() + "}]}";
+        // pede 2 unidades -> o total deve ser calculado no servidor (2 x 39.90 = 79.80)
+        String body = "{\"itens\":[{\"cardapioId\":" + prato.getId() + ",\"quantidade\":2}]}";
         mockMvc.perform(post("/api/pedidos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.valorTotal").value(39.9))
+                .andExpect(jsonPath("$.valorTotal").value(79.8))
                 .andExpect(jsonPath("$.status").value("EM_PREPARO"));
     }
 }

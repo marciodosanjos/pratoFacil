@@ -13,6 +13,9 @@ public class Cardapio {
     private String descricao;
     private Double preco;
 
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
+
     // Loja a que este prato pertence. @JsonIgnore para não aninhar a loja na API.
     @ManyToOne
     @JoinColumn(name = "loja_id")
@@ -49,6 +52,14 @@ public class Cardapio {
 
     public void setPreco(Double preco) {
         this.preco = preco;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public Loja getLoja() {

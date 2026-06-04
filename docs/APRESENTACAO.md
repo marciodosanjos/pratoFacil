@@ -91,7 +91,7 @@ Obrigado!"
 
 1. **Vitrine de lojas:** abrir `/lojas` — mostra as várias lojas do marketplace; abrir uma loja exibe o cardápio dela (RF01).
 2. **Cadastro/login de cliente:** criar conta em `/cadastro`, logar (cai na vitrine de lojas).
-3. **Fazer um pedido (RF02):** escolher uma loja, selecionar itens e confirmar.
+3. **Fazer um pedido (RF02):** escolher uma loja, navegar pelas **categorias**, ajustar a **quantidade (+/−)** dos itens, conferir o **carrinho** (total ao vivo) e finalizar.
 4. **Acompanhamento:** mostrar a página de pedido com a **linha do tempo** de status.
 5. **Empreendedor (ADMIN):** logar como um lojista, ex.: `maozinhaburger@pratofacil.com` / `burger123`
    (cada loja tem login próprio — ver lista no README). Mostrar o **isolamento**: o lojista só vê o cardápio e os pedidos da sua loja.

@@ -1,8 +1,10 @@
 package com.example.vendeFacil.service;
 
+import com.example.vendeFacil.dto.PedidoRequest;
 import com.example.vendeFacil.exception.RecursoNaoEncontradoException;
 import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Cardapio;
+import com.example.vendeFacil.model.ItemPedido;
 import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-// Regras de negócio dos pedidos: monta o pedido a partir dos pratos enviados,
-// calcula o valor total no servidor e controla o ciclo de vida do status.
+// Regras de negócio dos pedidos: monta o pedido a partir dos itens (com
+// quantidade) enviados, calcula o valor total no servidor e controla o status.
 @Service
 public class PedidoService {
 
@@ -31,12 +33,10 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    // Pedidos de um cliente (área "Meus Pedidos").
     public List<Pedido> listarDoCliente(Usuario cliente) {
         return pedidoRepository.findByClienteOrderByIdDesc(cliente);
     }
 
-    // Pedidos recebidos por uma loja (gestão do empreendedor).
     public List<Pedido> listarDaLoja(Loja loja) {
         return pedidoRepository.findByLojaOrderByIdDesc(loja);
     }
@@ -46,7 +46,6 @@ public class PedidoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: " + id));
     }
 
-    // Busca um pedido garantindo que ele pertence ao cliente informado.
     public Pedido buscarDoCliente(Long id, Usuario cliente) {
         Pedido pedido = buscarPorId(id);
         if (cliente == null || pedido.getCliente() == null
@@ -56,22 +55,22 @@ public class PedidoService {
         return pedido;
     }
 
-    // RF02 - cria o pedido vinculado ao cliente logado. O valor total é SEMPRE
-    // calculado no servidor; a loja é derivada dos itens (todos da mesma loja).
-    public Pedido criar(Pedido pedido, Usuario cliente) {
-        if (pedido.getCardapios() == null || pedido.getCardapios().isEmpty()) {
+    // RF02 - cria o pedido a partir dos itens (com quantidade) enviados pelo cliente.
+    // O valor total é SEMPRE calculado no servidor; a loja é derivada dos itens.
+    public Pedido criar(PedidoRequest request, Usuario cliente) {
+        if (request == null || request.getItens() == null || request.getItens().isEmpty()) {
             throw new RegraNegocioException("O pedido precisa ter pelo menos um item");
         }
 
-        List<Cardapio> itens = new ArrayList<>();
+        List<ItemPedido> itens = new ArrayList<>();
         double total = 0.0;
         Loja loja = null;
 
-        for (Cardapio item : pedido.getCardapios()) {
-            if (item == null || item.getId() == null) {
-                continue; // ignora itens vazios vindos do formulário
+        for (PedidoRequest.ItemRequest ir : request.getItens()) {
+            if (ir == null || ir.getCardapioId() == null || ir.getQuantidade() <= 0) {
+                continue; // ignora itens nao selecionados (quantidade 0)
             }
-            Long itemId = item.getId();
+            Long itemId = ir.getCardapioId();
             Cardapio prato = cardapioRepository.findById(itemId)
                     .orElseThrow(() -> new RegraNegocioException("Prato inválido no pedido: " + itemId));
 
@@ -82,26 +81,24 @@ public class PedidoService {
                 throw new RegraNegocioException("Um pedido só pode conter itens da mesma loja");
             }
 
-            itens.add(prato);
+            itens.add(new ItemPedido(prato, ir.getQuantidade()));
             if (prato.getPreco() != null) {
-                total += prato.getPreco();
+                total += prato.getPreco() * ir.getQuantidade();
             }
         }
 
         if (itens.isEmpty()) {
-            throw new RegraNegocioException("O pedido precisa ter pelo menos um item válido");
+            throw new RegraNegocioException("Selecione ao menos um item (quantidade maior que zero)");
         }
 
-        pedido.setCardapios(itens);
+        Pedido pedido = new Pedido();
+        pedido.setItens(itens);
         pedido.setValorTotal(total);
-        pedido.setStatus(Status.EM_PREPARO); // todo pedido novo começa em preparo
+        pedido.setStatus(Status.EM_PREPARO);
         pedido.setCliente(cliente);
         pedido.setLoja(loja);
-
-        if (pedido.getNome() == null || pedido.getNome().isBlank()) {
-            String quem = (cliente != null && cliente.getNome() != null) ? cliente.getNome() : "Cliente";
-            pedido.setNome("Pedido de " + quem);
-        }
+        String quem = (cliente != null && cliente.getNome() != null) ? cliente.getNome() : "Cliente";
+        pedido.setNome("Pedido de " + quem);
 
         return pedidoRepository.save(pedido);
     }

@@ -1,5 +1,6 @@
 package com.example.vendeFacil.controller;
 
+import com.example.vendeFacil.dto.PedidoRequest;
 import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
@@ -31,11 +32,11 @@ public class PedidoController {
 
     // Cliente confirma o pedido (a partir do cardápio de uma loja).
     @PostMapping("/novo-pedido")
-    public String novoPedido(@ModelAttribute Pedido pedido,
+    public String novoPedido(@ModelAttribute PedidoRequest request,
                              @RequestParam(value = "lojaId", required = false) Long lojaId,
                              @AuthenticationPrincipal UserDetails principal) {
         try {
-            Pedido salvo = service.criar(pedido, logado(principal));
+            Pedido salvo = service.criar(request, logado(principal));
             return "redirect:/meus-pedidos/" + salvo.getId();
         } catch (RegraNegocioException e) {
             return lojaId != null ? "redirect:/lojas/" + lojaId + "?vazio" : "redirect:/lojas";

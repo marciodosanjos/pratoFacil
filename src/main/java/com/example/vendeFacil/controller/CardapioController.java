@@ -1,6 +1,7 @@
 package com.example.vendeFacil.controller;
 
 import com.example.vendeFacil.model.Cardapio;
+import com.example.vendeFacil.model.Categoria;
 import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.service.CardapioService;
 import com.example.vendeFacil.service.UsuarioService;
@@ -37,6 +38,7 @@ public class CardapioController {
     public ModelAndView exibirFormCardapio() {
         ModelAndView mv = new ModelAndView("registrar-prato");
         mv.addObject("pratoObjeto", new Cardapio());
+        mv.addObject("categorias", Categoria.values());
         return mv;
     }
 
@@ -65,6 +67,7 @@ public class CardapioController {
     public ModelAndView editarPratoFormAdmin(@PathVariable("id") Long id) {
         ModelAndView mv = new ModelAndView("editar-prato");
         mv.addObject("prato", service.buscarPorId(id));
+        mv.addObject("categorias", Categoria.values());
         return mv;
     }
 
