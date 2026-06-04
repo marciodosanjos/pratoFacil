@@ -43,7 +43,8 @@ public class PedidoController {
             Usuario cliente = logado(principal);
             Pedido salvo = service.criar(request, cliente);
             pagamentoService.gerarCobranca(salvo, cliente);
-            return "redirect:/meus-pedidos/" + salvo.getId();
+            // Após confirmar o pedido, o cliente vai para a tela de pagamento.
+            return "redirect:/meus-pedidos/" + salvo.getId() + "/pagamento";
         } catch (RegraNegocioException e) {
             return lojaId != null ? "redirect:/lojas/" + lojaId + "?vazio" : "redirect:/lojas";
         }
@@ -82,6 +83,18 @@ public class PedidoController {
         mv.addObject("pedido", pedido);
         mv.addObject("pix", pagamentoService.obterPix(pedido));
         return mv;
+    }
+
+    // Confirma o pagamento na tela do app (PIX ou cartão). Em sandbox a
+    // confirmação é simulada; com a chave Asaas o PIX real também confirma
+    // sozinho via webhook.
+    @PostMapping("/meus-pedidos/{id}/pagamento/confirmar")
+    public String confirmarPagamento(@PathVariable Long id,
+                                     @RequestParam("metodo") com.example.vendeFacil.model.TipoPagamento metodo,
+                                     @AuthenticationPrincipal UserDetails principal) {
+        Pedido pedido = service.buscarDoCliente(id, logado(principal));
+        pagamentoService.confirmarManual(pedido, metodo);
+        return "redirect:/meus-pedidos/" + id + "/pagamento?pago";
     }
 
     // Área do empreendedor: pedidos recebidos pela SUA loja + gestão de status (RF03).

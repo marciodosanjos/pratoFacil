@@ -66,7 +66,8 @@
 <div class="card" th:if="${pedido.statusPagamento != null}" style="text-align:center; margin-bottom:24px;">
     <h3 style="margin:0 0 14px; color:#0c0b09; text-transform:uppercase; letter-spacing:1px; font-size:15px;">Pagamento</h3>
     <span th:if="${pedido.statusPagamento.name() == 'CONFIRMADO'}"
-          style="display:inline-block; padding:8px 16px; border-radius:6px; background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; font-weight:bold;">Pago</span>
+          style="display:inline-block; padding:8px 16px; border-radius:6px; background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; font-weight:bold;"
+          th:text="${pedido.metodoPagamento != null} ? 'Pago • ' + ${pedido.metodoPagamento.descricao} : 'Pago'">Pago</span>
     <div th:if="${pedido.statusPagamento.name() == 'PENDENTE'}">
         <span style="display:inline-block; padding:8px 16px; border-radius:6px; background:#fff9e6; color:#b89252; border:1px solid #ffe8b3; font-weight:bold;">Aguardando pagamento</span>
         <div style="margin-top:14px;">

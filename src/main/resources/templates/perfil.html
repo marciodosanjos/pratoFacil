@@ -71,18 +71,18 @@
         </li>
     </ul>
 
-    <form th:action="@{/perfil/metodo}" method="post" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
-        <div style="flex:1; min-width:140px;">
-            <label for="tipo">Tipo</label>
-            <select id="tipo" name="tipo" required style="width:100%; padding:11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
+    <form th:action="@{/perfil/metodo}" method="post" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:1; min-width:130px;">
+            <label for="tipo" style="margin-bottom:6px;">Tipo</label>
+            <select id="tipo" name="tipo" required style="width:100%; height:46px; margin:0; padding:0 11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
                 <option th:each="t : ${tiposPagamento}" th:value="${t}" th:text="${t.descricao}">Tipo</option>
             </select>
         </div>
         <div style="flex:2; min-width:160px;">
-            <label for="descricao">Apelido (opcional)</label>
-            <input type="text" id="descricao" name="descricao" placeholder="ex: Cartão final 1234" style="width:100%; padding:11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
+            <label for="descricao" style="margin-bottom:6px;">Apelido (opcional)</label>
+            <input type="text" id="descricao" name="descricao" placeholder="ex: Cartão final 1234" style="width:100%; height:46px; margin:0; padding:0 12px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:15px;">
         </div>
-        <button type="submit" class="btn" style="width:auto; padding:12px 20px;">Adicionar</button>
+        <button type="submit" class="btn" style="width:auto; height:46px; margin:0; padding:0 22px;">Adicionar</button>
     </form>
 </div>
 

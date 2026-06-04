@@ -66,6 +66,17 @@ public class PagamentoService {
         }
     }
 
+    // Confirma o pagamento pela tela do app, registrando o método escolhido
+    // (PIX ou cartão). Usado no fluxo de checkout do cliente.
+    public void confirmarManual(Pedido pedido, com.example.vendeFacil.model.TipoPagamento metodo) {
+        if (pedido == null) {
+            return;
+        }
+        pedido.setMetodoPagamento(metodo);
+        pedido.setStatusPagamento(StatusPagamento.CONFIRMADO);
+        pedidoRepository.save(pedido);
+    }
+
     // Confirma o pagamento de um pedido a partir do id da cobrança (via webhook).
     public void confirmarPagamento(String asaasPaymentId) {
         if (asaasPaymentId == null) {

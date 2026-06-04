@@ -46,6 +46,10 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private StatusPagamento statusPagamento;
 
+    // Como o cliente pagou (PIX ou cartão), definido na tela de pagamento.
+    @Enumerated(EnumType.STRING)
+    private TipoPagamento metodoPagamento;
+
     public Long getId() {
         return id;
     }
@@ -146,5 +150,13 @@ public class Pedido {
 
     public void setStatusPagamento(StatusPagamento statusPagamento) {
         this.statusPagamento = statusPagamento;
+    }
+
+    public TipoPagamento getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setMetodoPagamento(TipoPagamento metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
     }
 }

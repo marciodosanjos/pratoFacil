@@ -8,6 +8,7 @@ import com.example.vendeFacil.model.ItemPedido;
 import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
+import com.example.vendeFacil.model.StatusPagamento;
 import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.repository.CardapioRepository;
 import com.example.vendeFacil.repository.PedidoRepository;
@@ -107,6 +108,9 @@ public class PedidoService {
         pedido.setItens(itens);
         pedido.setValorTotal(total);
         pedido.setStatus(Status.EM_PREPARO);
+        // Todo pedido nasce aguardando pagamento; a confirmação acontece na
+        // tela de pagamento (PIX/cartão) ou via webhook do Asaas.
+        pedido.setStatusPagamento(StatusPagamento.PENDENTE);
         pedido.setCliente(cliente);
         pedido.setLoja(loja);
         String quem = (cliente != null && cliente.getNome() != null) ? cliente.getNome() : "Cliente";
