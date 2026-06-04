@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="15">
     <title>Meus Pedidos</title>
     <style>
         body {
@@ -144,6 +146,8 @@
 </head>
 <body>
 
+<div th:replace="~{fragments/nav :: clienteNav}"></div>
+
 <div class="header">
     <h1>Meus Pedidos</h1>
     <p>Acompanhe o andamento dos seus pedidos em tempo real</p>
@@ -151,7 +155,7 @@
 
 <div th:if="${!#lists.isEmpty(pedidos)}">
 
-    <div class="pedido-card" th:each="p : ${pedidos}">
+    <a class="pedido-card" th:href="@{'/meus-pedidos/' + ${p.id}}" th:each="p : ${pedidos}" style="text-decoration:none; color:inherit;">
         <div class="pedido-info">
             <h3 th:text="${p.nome}">Pedido #1234</h3>
             <div class="pedido-meta">
@@ -170,7 +174,7 @@
                 STATUS
             </span>
         </div>
-    </div>
+    </a>
 
 </div>
 
@@ -180,10 +184,13 @@
 
 <div style="text-align: center;">
     <a href="/pratos" class="btn-voltar">Fazer Novo Pedido</a>
+    <form th:action="@{/logout}" method="post" style="display:inline-block; margin-left:10px;">
+        <button type="submit" class="btn-voltar" style="cursor:pointer;">Sair</button>
+    </form>
 </div>
 
 <div class="footer">
-    <p>VendeFácil • Agradecemos a preferência!</p>
+    <p>PratoFácil • Agradecemos a preferência!</p>
 </div>
 
 </body>

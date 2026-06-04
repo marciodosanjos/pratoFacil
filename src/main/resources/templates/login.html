@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d; background-color: var(--cream);
+            margin: 0; padding: 24px;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .card {
+            background: #fff; width: 100%; max-width: 400px;
+            border: 1px solid #e1d6c6; border-radius: 10px;
+            padding: 36px 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+        .brand { text-align: center; margin-bottom: 28px; }
+        .brand h1 {
+            color: var(--dark); font-size: 26px; margin: 0;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .brand p { color: var(--gold); font-style: italic; margin: 6px 0 0; font-size: 14px; }
+        label { display:block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: bold; }
+        input {
+            width: 100%; padding: 12px; margin-bottom: 18px;
+            border: 1px solid #e1d6c6; border-radius: 6px; font-size: 15px; background:#fcfaf7;
+        }
+        input:focus { outline: none; border-color: var(--gold); }
+        .btn {
+            width: 100%; padding: 13px; border: none; border-radius: 6px;
+            background: var(--gold); color: #fff; font-size: 15px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+        }
+        .btn:hover { background: #b89252; }
+        .alt { text-align: center; margin-top: 20px; font-size: 14px; color: var(--muted); }
+        .alt a { color: var(--gold); font-weight: bold; text-decoration: none; }
+        .msg { padding: 11px 14px; border-radius: 6px; font-size: 14px; margin-bottom: 18px; text-align:center; }
+        .msg-erro { background:#fdecea; color:#b3261e; border:1px solid #f3c2bd; }
+        .msg-ok   { background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="brand">
+        <h1>PratoFácil</h1>
+        <p>Acesse sua conta</p>
+    </div>
+
+    <div class="msg msg-erro" th:if="${param.error}">E-mail ou senha inválidos.</div>
+    <div class="msg msg-ok" th:if="${param.logout}">Você saiu da sua conta.</div>
+    <div class="msg msg-ok" th:if="${param.cadastro}">Conta criada! Faça login para continuar.</div>
+    <div class="msg msg-erro" th:if="${param.sessao}">Sua sessão expirou. Entre novamente.</div>
+    <div class="msg msg-ok" th:if="${param.emailAlterado}">E-mail alterado! Entre novamente com o novo e-mail.</div>
+
+    <form th:action="@{/login}" method="post">
+        <label for="username">E-mail</label>
+        <input type="email" id="username" name="username" placeholder="voce@email.com" required autofocus>
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="••••••" required>
+
+        <button class="btn" type="submit">Entrar</button>
+    </form>
+
+    <div class="alt">
+        Não tem conta? <a th:href="@{/cadastro}">Cadastre-se</a><br>
+        <a th:href="@{/pratos}">Ver cardápio sem entrar</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,87 +1,87 @@
 package com.example.vendeFacil.controller;
+
 import com.example.vendeFacil.model.Cardapio;
-import com.example.vendeFacil.repository.CardapioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.vendeFacil.model.Categoria;
+import com.example.vendeFacil.model.Usuario;
+import com.example.vendeFacil.service.CardapioService;
+import com.example.vendeFacil.service.UsuarioService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+// Controller Web (Thymeleaf) do cardápio. Gestão é escopada à loja do admin logado.
 @Controller
 public class CardapioController {
 
-    @Autowired
-    private CardapioRepository repository;
+    private final CardapioService service;
+    private final UsuarioService usuarioService;
 
-    @PostMapping("/admin/pratos/registrar")
-    public String registrarCardapio(@ModelAttribute Cardapio c) {
-        repository.save(c);
-        return "redirect:/pratos";
+    public CardapioController(CardapioService service, UsuarioService usuarioService) {
+        this.service = service;
+        this.usuarioService = usuarioService;
     }
 
-    // 2. Rota RECEBE dados enviados via HTML
-    // Como os dados vêm de um form tradicional, usamos @ModelAttribute
+    private Usuario admin(UserDetails principal) {
+        return usuarioService.buscarPorEmailOpcional(principal.getUsername())
+                .orElseThrow(com.example.vendeFacil.exception.SessaoInvalidaException::new);
+    }
+
+    @PostMapping("/admin/pratos/registrar")
+    public String registrarCardapio(@ModelAttribute Cardapio c,
+                                    @AuthenticationPrincipal UserDetails principal) {
+        service.criar(c, admin(principal).getLoja());
+        return "redirect:/admin/pratos";
+    }
+
     @GetMapping("/admin/pratos/registrar")
     public ModelAndView exibirFormCardapio() {
         ModelAndView mv = new ModelAndView("registrar-prato");
         mv.addObject("pratoObjeto", new Cardapio());
+        mv.addObject("categorias", Categoria.values());
         return mv;
     }
 
+    // A antiga página única de cardápio dá lugar à vitrine de lojas.
     @GetMapping("/pratos")
-    public ModelAndView verCardapio() {
-        ModelAndView mv = new ModelAndView("pratos");
-        mv.addObject("pratos", repository.findAll());
-        return mv;
+    public String redirecionarParaLojas() {
+        return "redirect:/lojas";
     }
 
-    @GetMapping("/pratos/{id}")
-    public ModelAndView editarPratoForm(@PathVariable("id") int id) {
-        ModelAndView mv = new ModelAndView("editar-prato");
-
-        // Busca o prato ou redireciona se não achar
-        Cardapio prato = repository.findById((long) id)
-                .orElseThrow(() -> new IllegalArgumentException("Prato inválido:" + id));
-
-        mv.addObject("prato", prato);
-        return mv;
-    }
-
-    // Rotas para área administrativa do cardápio
     @GetMapping("/admin")
-    public String homeAdmin() {
-        return "admin-home";
+    public ModelAndView homeAdmin(@AuthenticationPrincipal UserDetails principal) {
+        Usuario a = admin(principal);
+        ModelAndView mv = new ModelAndView("admin-home");
+        mv.addObject("loja", a.getLoja());
+        mv.addObject("nomeLoja", a.getLoja() != null ? a.getLoja().getNome() : "");
+        return mv;
     }
 
     @GetMapping("/admin/pratos")
-    public ModelAndView adminCardapio() {
+    public ModelAndView adminCardapio(@AuthenticationPrincipal UserDetails principal) {
         ModelAndView mv = new ModelAndView("admin");
-        mv.addObject("itens", repository.findAll());
+        mv.addObject("itens", service.listarPorLoja(admin(principal).getLoja()));
         return mv;
     }
 
     @GetMapping("/admin/pratos/editar/{id}")
-    public ModelAndView editarPratoForm(@PathVariable("id") long id) { // ◄ Verifique se o "id" está aqui
+    public ModelAndView editarPratoFormAdmin(@PathVariable("id") Long id) {
         ModelAndView mv = new ModelAndView("editar-prato");
-
-        // Convertemos para Long aqui dentro para o findById, se seu repository exigir Long
-        Cardapio prato = repository.findById((long) id)
-                .orElseThrow(() -> new IllegalArgumentException("Prato inválido: " + id));
-
-        mv.addObject("prato", prato);
+        mv.addObject("prato", service.buscarPorId(id));
+        mv.addObject("categorias", Categoria.values());
         return mv;
     }
 
     @PostMapping("/admin/pratos/editar")
     public String atualizarPrato(@ModelAttribute Cardapio cardapio) {
-        repository.save(cardapio);
+        service.atualizar(cardapio.getId(), cardapio);
         return "redirect:/admin/pratos";
     }
 
-    // Rota para deletar um prato do cardápio pelo ID
     @PostMapping("/admin/pratos/deletar/{id}")
-    public String deletarPrato(@PathVariable("id") int id) {
-        repository.deleteById((long) id);
+    public String deletarPrato(@PathVariable("id") Long id) {
+        service.deletar(id);
         return "redirect:/admin/pratos";
     }
-
 }

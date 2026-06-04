@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - VendeFácil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - PratoFácil</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -119,8 +120,11 @@
 <body>
 
 <div class="header">
+    <img th:if="${loja != null}" th:src="@{'/lojas/' + ${loja.id} + '/logo'}" alt="logo"
+         style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #cda45e;margin-bottom:12px;"
+         onerror="this.style.display='none'">
     <h1>Painel de Controle</h1>
-    <p>Bem-vindo ao ambiente de gestão do VendeFácil</p>
+    <p th:text="${nomeLoja != null and !nomeLoja.isEmpty()} ? 'Loja: ' + ${nomeLoja} : 'Bem-vindo ao ambiente de gestão do PratoFácil'">Bem-vindo ao ambiente de gestão do PratoFácil</p>
 </div>
 
 <div class="admin-grid">
@@ -143,11 +147,29 @@
         <span class="btn-admin">Acessar</span>
     </a>
 
-    <a th:href="@{/meus-pedidos}" class="admin-card">
+    <a th:href="@{/admin/pedidos}" class="admin-card">
         <div>
             <div class="card-icon">🛍️</div>
-            <h2>Acompanhar Pedidos</h2>
+            <h2>Gestão de Pedidos</h2>
             <p>Gerencie o status dos pedidos e acompanhe a produção e a entrega em tempo real.</p>
+        </div>
+        <span class="btn-admin">Acessar</span>
+    </a>
+
+    <a th:href="@{/admin/dashboard}" class="admin-card">
+        <div>
+            <div class="card-icon">📊</div>
+            <h2>Dashboard</h2>
+            <p>Veja o faturamento, o total de pedidos e o resumo por status de entrega.</p>
+        </div>
+        <span class="btn-admin">Acessar</span>
+    </a>
+
+    <a th:href="@{/admin/perfil}" class="admin-card">
+        <div>
+            <div class="card-icon">🏪</div>
+            <h2>Perfil da Loja</h2>
+            <p>Edite a logo (400x400), o nome do restaurante, o e-mail e a senha.</p>
         </div>
         <span class="btn-admin">Acessar</span>
     </a>
@@ -155,7 +177,10 @@
 </div>
 
 <div class="footer">
-    <p>VendeFácil Admin • Painel do Estabelecimento</p>
+    <p>PratoFácil Admin • Painel do Estabelecimento</p>
+    <form th:action="@{/logout}" method="post" style="margin-top:10px;">
+        <button type="submit" style="background:none;border:none;color:#cda45e;cursor:pointer;font-weight:bold;text-decoration:underline;font-size:13px;">Sair da conta</button>
+    </form>
 </div>
 
 </body>

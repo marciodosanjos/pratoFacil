@@ -1,5 +1,7 @@
 package com.example.vendeFacil.controller;
 
+import com.example.vendeFacil.exception.RecursoNaoEncontradoException;
+import com.example.vendeFacil.exception.RegraNegocioException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,19 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Erros lançados de propósito nos controllers (ex: 404 Not Found, 400 Bad Request)
+    // Recurso inexistente (prato/pedido) -> 404 Not Found
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> tratarNaoEncontrado(RecursoNaoEncontradoException ex) {
+        return montarResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    // Violação de regra de negócio / dados inválidos -> 400 Bad Request
+    @ExceptionHandler(RegraNegocioException.class)
+    public ResponseEntity<Map<String, Object>> tratarRegraNegocio(RegraNegocioException ex) {
+        return montarResposta(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    // Erros lançados com status HTTP explícito (compatibilidade)
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> tratarStatus(ResponseStatusException ex) {
         return montarResposta(HttpStatus.valueOf(ex.getStatusCode().value()), ex.getReason());

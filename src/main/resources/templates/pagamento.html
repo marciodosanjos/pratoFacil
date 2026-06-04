@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; --green:#1e7e34; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px; max-width:520px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:20px; margin-bottom:28px; }
+        .header h1 { color:var(--dark); font-size:22px; margin:0 0 6px; text-transform:uppercase; letter-spacing:2px; }
+        .header p { color:var(--gold); font-style:italic; margin:0; }
+        .card { background:#fff; border-radius:10px; padding:28px 24px; box-shadow:0 4px 15px rgba(0,0,0,0.06); margin-bottom:22px; }
+        .valor { font-size:30px; font-weight:bold; color:var(--dark); margin:0; text-align:center; }
+        .valor-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:4px 0 0; text-align:center; }
+        /* abas de metodo */
+        .tabs { display:flex; gap:10px; margin:0 0 22px; }
+        .tab { flex:1; padding:12px; border:1px solid #e1d6c6; border-radius:8px; background:#fcfaf7; color:var(--muted); font-weight:bold; font-size:14px; cursor:pointer; text-align:center; }
+        .tab.active { border-color:var(--gold); background:#fff; color:var(--dark); box-shadow:0 0 0 2px rgba(205,164,94,.25); }
+        .panel { display:none; }
+        .panel.active { display:block; }
+        .qr { width:210px; height:210px; border:1px solid #e1d6c6; border-radius:10px; padding:8px; background:#fff; display:block; margin:0 auto; }
+        .center { text-align:center; }
+        .copia { display:flex; gap:8px; margin-top:16px; }
+        .copia input { flex:1; min-width:0; padding:11px; border:1px solid #e1d6c6; border-radius:6px; background:#fcfaf7; font-size:12px; color:#6a5b52; font-family:monospace; }
+        .copia button { padding:11px 16px; background:#fff; color:var(--gold); border:1px solid var(--gold); border-radius:6px; font-weight:bold; cursor:pointer; white-space:nowrap; font-size:13px; }
+        .copia button:hover { background:var(--gold); color:#fff; }
+        label { display:block; font-size:12px; color:var(--muted); margin:14px 0 6px; font-weight:bold; text-transform:uppercase; letter-spacing:.5px; }
+        .campo { width:100%; padding:12px; border:1px solid #e1d6c6; border-radius:6px; font-size:15px; background:#fcfaf7; }
+        .campo:focus { outline:none; border-color:var(--gold); }
+        .linha { display:flex; gap:12px; }
+        .linha > div { flex:1; }
+        .btn-pagar { width:100%; margin-top:20px; padding:14px; background:var(--gold); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; cursor:pointer; }
+        .btn-pagar:hover { background:#b89252; }
+        .aviso { font-size:12px; color:var(--muted); margin-top:16px; text-align:center; }
+        .check { width:74px; height:74px; border-radius:50%; background:#e6f9ed; color:var(--green); display:flex; align-items:center; justify-content:center; font-size:42px; margin:0 auto 16px; border:2px solid #b3f0c2; }
+        .pago-titulo { color:var(--green); font-size:20px; font-weight:bold; margin:0 0 6px; text-align:center; }
+        .acoes { text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+        .btn { display:inline-block; padding:11px 22px; border:1px solid var(--gold); color:var(--gold); background:transparent; border-radius:4px; text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:13px; }
+        .btn:hover { background:var(--gold); color:#fff; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: clienteNav}"></div>
+
+<div class="header">
+    <h1>Pagamento</h1>
+    <p>Pedido #<span th:text="${pedido.id}">1</span></p>
+</div>
+
+<!-- ESTADO 1: pagamento confirmado (tela de confirmação) -->
+<div class="card" th:if="${pedido.statusPagamento != null and pedido.statusPagamento.name() == 'CONFIRMADO'}">
+    <div class="check">&#10003;</div>
+    <p class="pago-titulo">Pagamento confirmado!</p>
+    <p class="valor-label" th:if="${pedido.metodoPagamento != null}"
+       th:text="'Pago com ' + ${pedido.metodoPagamento.descricao}">Pago com Pix</p>
+    <p class="valor" style="margin-top:14px;" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')}">R$ 0,00</p>
+    <p class="aviso">Seu pedido já está em preparo. Acompanhe pela tela do pedido.</p>
+</div>
+
+<!-- ESTADO 2: pendente -> escolher método e pagar -->
+<div th:if="${pedido.statusPagamento != null and pedido.statusPagamento.name() == 'PENDENTE'}">
+    <div class="card">
+        <p class="valor" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')}">R$ 0,00</p>
+        <p class="valor-label">Total a pagar</p>
+
+        <div class="tabs" style="margin-top:22px;">
+            <div class="tab active" id="tab-pix" onclick="mostrar('pix')">PIX</div>
+            <div class="tab" id="tab-cartao" onclick="mostrar('cartao')">Cartão de crédito</div>
+        </div>
+
+        <!-- PAINEL PIX -->
+        <div class="panel active" id="painel-pix">
+            <div class="center" th:if="${pix != null}">
+                <img class="qr" th:src="'data:image/png;base64,' + ${pix.encodedImage}" alt="QR Code PIX">
+                <div class="copia">
+                    <input id="pixCode" type="text" th:value="${pix.payload}" readonly>
+                    <button type="button" onclick="copiarPix()">Copiar</button>
+                </div>
+                <p class="aviso">Escaneie o QR Code ou use o código copia-e-cola no app do seu banco.</p>
+            </div>
+            <div class="center" th:if="${pix == null}">
+                <p style="font-size:48px; margin:10px 0 0;">&#128179;</p>
+                <p class="aviso" style="margin-top:4px;">Pagamento via PIX. Clique abaixo para confirmar.</p>
+            </div>
+            <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/confirmar'}" method="post">
+                <input type="hidden" name="metodo" value="PIX">
+                <button type="submit" class="btn-pagar">Confirmar pagamento</button>
+            </form>
+        </div>
+
+        <!-- PAINEL CARTÃO -->
+        <div class="panel" id="painel-cartao">
+            <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/confirmar'}" method="post" onsubmit="return validarCartao()">
+                <input type="hidden" name="metodo" value="CARTAO_CREDITO">
+                <label for="numero">Número do cartão</label>
+                <input class="campo" id="numero" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" required>
+                <label for="titular">Nome impresso no cartão</label>
+                <input class="campo" id="titular" type="text" placeholder="Como está no cartão" required>
+                <div class="linha">
+                    <div>
+                        <label for="validade">Validade</label>
+                        <input class="campo" id="validade" type="text" maxlength="5" placeholder="MM/AA" required>
+                    </div>
+                    <div>
+                        <label for="cvv">CVV</label>
+                        <input class="campo" id="cvv" type="text" inputmode="numeric" maxlength="4" placeholder="123" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-pagar"
+                        th:text="'Pagar R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')}">Pagar</button>
+            </form>
+        </div>
+
+        <p class="aviso" style="margin-top:22px;">Ambiente de testes (sandbox) — nenhum valor real é cobrado e nenhum dado de cartão é armazenado.</p>
+    </div>
+</div>
+
+<!-- ESTADO 3: pedido sem cobrança -->
+<div class="card" th:if="${pedido.statusPagamento == null}">
+    <p class="valor" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal,1,'POINT',2,'COMMA')}">R$ 0,00</p>
+    <p class="valor-label">Pague na entrega.</p>
+</div>
+
+<div class="acoes">
+    <a th:href="@{'/meus-pedidos/' + ${pedido.id}}" class="btn">Acompanhar pedido</a>
+    <a th:href="@{/meus-pedidos}" class="btn">Meus pedidos</a>
+</div>
+
+<script>
+    function mostrar(metodo) {
+        var ehPix = metodo === 'pix';
+        document.getElementById('painel-pix').classList.toggle('active', ehPix);
+        document.getElementById('painel-cartao').classList.toggle('active', !ehPix);
+        document.getElementById('tab-pix').classList.toggle('active', ehPix);
+        document.getElementById('tab-cartao').classList.toggle('active', !ehPix);
+    }
+    function copiarPix() {
+        var campo = document.getElementById('pixCode');
+        campo.select();
+        campo.setSelectionRange(0, 99999);
+        var btn = event.target;
+        var feito = function () { btn.textContent = 'Copiado!'; setTimeout(function () { btn.textContent = 'Copiar'; }, 2000); };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(campo.value).then(feito, function () { document.execCommand('copy'); feito(); });
+        } else { document.execCommand('copy'); feito(); }
+    }
+    function validarCartao() {
+        var num = document.getElementById('numero').value.replace(/\D/g, '');
+        if (num.length < 13) { alert('Informe um número de cartão válido.'); return false; }
+        return true;
+    }
+</script>
+
+</body>
+</html>

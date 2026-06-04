@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px; max-width:900px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:20px; margin-bottom:30px; }
+        .header h1 { color:var(--dark); font-size:28px; margin:0 0 6px; text-transform:uppercase; letter-spacing:2px; }
+        .header p { color:var(--gold); font-style:italic; margin:0; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px; margin-bottom:20px; }
+        .stat { background:#fff; border:1px solid #e1d6c6; border-radius:8px; padding:24px 18px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+        .stat .num { font-size:32px; font-weight:bold; color:var(--dark); margin:0; }
+        .stat .lbl { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:6px; }
+        .stat.destaque { border-left:4px solid var(--gold); }
+        .stat.destaque .num { color:var(--gold); }
+        .secao { color:var(--dark); font-size:16px; border-left:4px solid var(--gold); padding-left:12px; margin:24px 0 14px; text-transform:uppercase; letter-spacing:1px; }
+        .acoes { text-align:center; margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+        .btn { display:inline-block; padding:11px 22px; border:1px solid var(--gold); color:var(--gold); background:transparent; border-radius:4px; text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:13px; }
+        .btn:hover { background:var(--gold); color:#fff; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Dashboard</h1>
+    <p th:text="${nomeLoja != null and !nomeLoja.isEmpty()} ? 'Loja: ' + ${nomeLoja} : 'Visão geral do seu negócio'">Visão geral do seu negócio</p>
+</div>
+
+<div class="grid">
+    <div class="stat destaque">
+        <p class="num" th:text="'R$ ' + ${#numbers.formatDecimal(faturamento,1,'POINT',2,'COMMA')}">R$ 0,00</p>
+        <div class="lbl">Faturamento</div>
+    </div>
+    <div class="stat">
+        <p class="num" th:text="${totalPedidos}">0</p>
+        <div class="lbl">Pedidos</div>
+    </div>
+    <div class="stat">
+        <p class="num" th:text="${totalPratos}">0</p>
+        <div class="lbl">Pratos no cardápio</div>
+    </div>
+    <div class="stat">
+        <p class="num" th:text="${clientes}">0</p>
+        <div class="lbl">Clientes</div>
+    </div>
+</div>
+
+<div class="secao">Pedidos por status</div>
+<div class="grid">
+    <div class="stat">
+        <p class="num" th:text="${emPreparo}">0</p>
+        <div class="lbl">Em preparo</div>
+    </div>
+    <div class="stat">
+        <p class="num" th:text="${saiuEntrega}">0</p>
+        <div class="lbl">Saiu para entrega</div>
+    </div>
+    <div class="stat">
+        <p class="num" th:text="${entregue}">0</p>
+        <div class="lbl">Entregue</div>
+    </div>
+</div>
+
+<div class="acoes">
+    <a th:href="@{/admin/pedidos}" class="btn">Gerir pedidos</a>
+    <a th:href="@{/admin}" class="btn">Voltar ao painel</a>
+</div>
+</body>
+</html>

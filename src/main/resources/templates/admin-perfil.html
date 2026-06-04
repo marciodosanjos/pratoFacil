@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil da Loja - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing:border-box; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; color:#3e322d; background:var(--cream); margin:0 auto; padding:40px 20px; max-width:540px; }
+        .header { text-align:center; border-bottom:2px dashed var(--gold); padding-bottom:18px; margin-bottom:24px; }
+        .header h1 { color:var(--dark); font-size:24px; margin:0; text-transform:uppercase; letter-spacing:2px; }
+        .card { background:#fff; border:1px solid #e1d6c6; border-radius:10px; padding:28px 24px; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
+        label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; font-weight:bold; text-transform:uppercase; letter-spacing:.5px; }
+        input[type=text], input[type=email], input[type=password] { width:100%; padding:12px; margin-bottom:18px; border:1px solid #e1d6c6; border-radius:6px; font-size:15px; background:#fcfaf7; }
+        input:focus { outline:none; border-color:var(--gold); }
+        .logo-area { text-align:center; margin-bottom:24px; }
+        .logo-area > label { display:block; margin-bottom:10px; }
+        .logo-preview { width:150px; height:150px; border-radius:50%; object-fit:cover; border:3px solid #e1d6c6; background:var(--cream); }
+        .btn-upload { display:inline-block; margin-top:14px; padding:10px 20px; background:#fff; color:var(--gold); border:1px solid var(--gold); border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; }
+        .btn-upload:hover { background:var(--gold); color:#fff; }
+        .logo-hint { font-size:12px; color:var(--muted); margin-top:8px; line-height:1.4; }
+        .hint { font-size:12px; color:var(--muted); margin:-12px 0 18px; }
+        .btn { width:100%; padding:13px; border:none; border-radius:6px; background:var(--gold); color:#fff; font-size:15px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; cursor:pointer; }
+        .btn:hover { background:#b89252; }
+        .voltar { display:block; text-align:center; margin-top:18px; color:var(--gold); text-decoration:none; font-weight:bold; font-size:14px; }
+        .msg { padding:11px 14px; border-radius:6px; font-size:14px; margin-bottom:18px; text-align:center; }
+        .msg-ok { background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; }
+        .msg-erro { background:#fdecea; color:#b3261e; border:1px solid #f3c2bd; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Perfil da Loja</h1>
+</div>
+
+<div class="msg msg-ok" th:if="${param.ok}">Perfil atualizado com sucesso.</div>
+<div class="msg msg-erro" th:if="${param.erro}">Não foi possível salvar. Verifique os dados (e-mail já em uso, imagem inválida, etc.).</div>
+
+<div class="card">
+    <form th:action="@{/admin/perfil}" method="post" enctype="multipart/form-data">
+
+        <div class="logo-area">
+            <label>Logo da loja</label>
+            <img id="preview" class="logo-preview" alt="logo"
+                 th:src="@{'/lojas/' + ${loja.id} + '/logo'}"
+                 onerror="this.style.visibility='hidden'">
+            <input type="file" id="logoInput" name="logo" accept="image/*" onchange="previewLogo(this)" style="display:none;">
+            <div><label for="logoInput" class="btn-upload">Escolher imagem</label></div>
+            <div id="nomeArquivo" class="logo-hint">Nenhuma imagem selecionada</div>
+            <div class="logo-hint">PNG ou JPG — a imagem entra numa moldura redonda.</div>
+        </div>
+
+        <label for="nomeLoja">Nome do restaurante</label>
+        <input type="text" id="nomeLoja" name="nomeLoja" th:value="${loja != null ? loja.nome : ''}" required>
+
+        <label for="email">E-mail (login)</label>
+        <input type="email" id="email" name="email" th:value="${usuario.email}" required>
+        <div class="hint">Se você mudar o e-mail, precisará entrar de novo com o novo e-mail.</div>
+
+        <label for="senha">Nova senha</label>
+        <input type="password" id="senha" name="senha" placeholder="deixe em branco para manter a atual" minlength="4">
+
+        <button type="submit" class="btn">Salvar alterações</button>
+    </form>
+</div>
+
+<a th:href="@{/admin}" class="voltar">← Voltar ao painel</a>
+
+<script>
+    function previewLogo(input) {
+        if (input.files && input.files[0]) {
+            const arquivo = input.files[0];
+            document.getElementById('nomeArquivo').textContent = arquivo.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById('preview');
+                img.src = e.target.result;
+                img.style.visibility = 'visible';
+            };
+            reader.readAsDataURL(arquivo);
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Item do Cardápio</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #faf6f0; color: #3e322d; padding: 40px 20px; max-width: 500px; margin: 0 auto; }
@@ -9,7 +10,7 @@
         h2 { color: #0c0b09; text-transform: uppercase; margin-bottom: 20px; font-size: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #cda45e; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #cda45e; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
         textarea { height: 80px; resize: vertical; }
         .btn-salvar { width: 100%; background-color: #cda45e; color: #fff; border: none; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-salvar:hover { background-color: #b89252; }
@@ -34,6 +35,14 @@
         <div class="form-group">
             <label>Preço (R$):</label>
             <input type="number" step="0.01" th:field="*{preco}" required />
+        </div>
+
+        <div class="form-group">
+            <label>Categoria:</label>
+            <select th:field="*{categoria}" required>
+                <option value="" disabled>Selecione a categoria</option>
+                <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat.descricao}">Categoria</option>
+            </select>
         </div>
 
         <button type="submit" class="btn-salvar">Salvar Alterações</button>
