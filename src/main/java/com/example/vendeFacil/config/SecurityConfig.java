@@ -30,7 +30,7 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .authorizeHttpRequests(auth -> auth
                 // Paginas e recursos publicos
-                .requestMatchers("/", "/pratos", "/pratos/**",
+                .requestMatchers("/", "/pratos", "/pratos/**", "/lojas", "/lojas/**",
                                  "/login", "/cadastro",
                                  "/css/**", "/js/**", "/images/**", "/webjars/**",
                                  "/h2-console/**",
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .successHandler((request, response, authentication) -> {
                     boolean admin = authentication.getAuthorities().stream()
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-                    response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/pratos"));
+                    response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/lojas"));
                 })
                 .permitAll()
             )

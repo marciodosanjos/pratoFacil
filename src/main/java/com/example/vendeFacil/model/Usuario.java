@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 // Usuario do sistema. O e-mail é o login; a senha é armazenada como hash BCrypt.
+// Quando o usuario é ADMIN, ele é dono de uma Loja (campo loja).
 @Entity
 @Table(name = "usuario")
 public class Usuario {
@@ -22,6 +23,11 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // Loja do empreendedor (preenchida apenas para usuarios ADMIN).
+    @ManyToOne
+    @JoinColumn(name = "loja_id")
+    private Loja loja;
 
     public Long getId() {
         return id;
@@ -61,5 +67,13 @@ public class Usuario {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Loja getLoja() {
+        return loja;
+    }
+
+    public void setLoja(Loja loja) {
+        this.loja = loja;
     }
 }

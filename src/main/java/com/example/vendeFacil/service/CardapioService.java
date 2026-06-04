@@ -3,6 +3,7 @@ package com.example.vendeFacil.service;
 import com.example.vendeFacil.exception.RecursoNaoEncontradoException;
 import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Cardapio;
+import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.repository.CardapioRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +24,21 @@ public class CardapioService {
         return repository.findAll();
     }
 
+    // Pratos de uma loja específica (cardápio da loja / gestão do lojista).
+    public List<Cardapio> listarPorLoja(Loja loja) {
+        return repository.findByLoja(loja);
+    }
+
     public Cardapio buscarPorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Prato não encontrado: " + id));
     }
 
-    public Cardapio criar(Cardapio cardapio) {
+    // Cria um prato vinculado a uma loja.
+    public Cardapio criar(Cardapio cardapio, Loja loja) {
         validar(cardapio);
         cardapio.setId(null); // garante criação (e não atualização acidental)
+        cardapio.setLoja(loja);
         return repository.save(cardapio);
     }
 

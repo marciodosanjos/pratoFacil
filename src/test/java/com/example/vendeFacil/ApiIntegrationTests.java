@@ -1,9 +1,11 @@
 package com.example.vendeFacil;
 
 import com.example.vendeFacil.model.Cardapio;
+import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.model.Role;
 import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.repository.CardapioRepository;
+import com.example.vendeFacil.repository.LojaRepository;
 import com.example.vendeFacil.repository.PedidoRepository;
 import com.example.vendeFacil.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,12 +33,24 @@ class ApiIntegrationTests {
     @Autowired private CardapioRepository cardapioRepository;
     @Autowired private PedidoRepository pedidoRepository;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private LojaRepository lojaRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
     @BeforeEach
-    void limpar() {
+    void setup() {
         pedidoRepository.deleteAll();
         cardapioRepository.deleteAll();
+        // Admin de teste com uma loja (o cadastro de prato resolve a loja do admin logado)
+        if (!usuarioRepository.existsByEmail("admin@test.com")) {
+            Loja loja = lojaRepository.save(new Loja("Loja Teste", "loja de testes"));
+            Usuario admin = new Usuario();
+            admin.setNome("Admin Teste");
+            admin.setEmail("admin@test.com");
+            admin.setSenha(passwordEncoder.encode("1234"));
+            admin.setRole(Role.ADMIN);
+            admin.setLoja(loja);
+            usuarioRepository.save(admin);
+        }
     }
 
     @Test
@@ -54,7 +68,7 @@ class ApiIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
     void adminCriaPratoRetorna201() throws Exception {
         mockMvc.perform(post("/api/pratos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +79,7 @@ class ApiIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
     void pratoSemNomeRetorna400() throws Exception {
         mockMvc.perform(post("/api/pratos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +90,7 @@ class ApiIntegrationTests {
 
     @Test
     void buscarPratoInexistenteRetorna404() throws Exception {
-        mockMvc.perform(get("/api/pratos/999"))
+        mockMvc.perform(get("/api/pratos/999999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
     }
@@ -84,8 +98,7 @@ class ApiIntegrationTests {
     @Test
     @WithMockUser(username = "cliente@test.com", roles = "CLIENTE")
     void clienteCriaPedidoComTotalCalculadoNoServidor() throws Exception {
-        // O controller resolve o cliente pelo e-mail do principal autenticado,
-        // entao o usuario precisa existir no banco.
+        // O controller resolve o cliente pelo e-mail do principal autenticado.
         Usuario cliente = new Usuario();
         cliente.setNome("Cliente Teste");
         cliente.setEmail("cliente@test.com");
@@ -93,9 +106,11 @@ class ApiIntegrationTests {
         cliente.setRole(Role.CLIENTE);
         usuarioRepository.save(cliente);
 
+        Loja loja = lojaRepository.save(new Loja("Loja do Pedido", ""));
         Cardapio prato = new Cardapio();
         prato.setNome("Feijoada");
         prato.setPreco(39.90);
+        prato.setLoja(loja);
         prato = cardapioRepository.save(prato);
 
         String body = "{\"cardapios\":[{\"id\":" + prato.getId() + "}]}";

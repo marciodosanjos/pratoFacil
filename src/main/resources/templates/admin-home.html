@@ -121,7 +121,7 @@
 
 <div class="header">
     <h1>Painel de Controle</h1>
-    <p>Bem-vindo ao ambiente de gestão do PratoFácil</p>
+    <p th:text="${nomeLoja != null and !nomeLoja.isEmpty()} ? 'Loja: ' + ${nomeLoja} : 'Bem-vindo ao ambiente de gestão do PratoFácil'">Bem-vindo ao ambiente de gestão do PratoFácil</p>
 </div>
 
 <div class="admin-grid">

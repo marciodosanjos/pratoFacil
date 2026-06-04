@@ -1,29 +1,38 @@
 package com.example.vendeFacil.controller;
 
 import com.example.vendeFacil.model.Cardapio;
+import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.service.CardapioService;
+import com.example.vendeFacil.service.UsuarioService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-// Controller Web (Thymeleaf) do cardápio. Renderiza páginas HTML para uso
-// direto no navegador, reaproveitando a mesma regra de negócio do CardapioService.
+// Controller Web (Thymeleaf) do cardápio. Gestão é escopada à loja do admin logado.
 @Controller
 public class CardapioController {
 
     private final CardapioService service;
+    private final UsuarioService usuarioService;
 
-    public CardapioController(CardapioService service) {
+    public CardapioController(CardapioService service, UsuarioService usuarioService) {
         this.service = service;
+        this.usuarioService = usuarioService;
+    }
+
+    private Usuario admin(UserDetails principal) {
+        return usuarioService.buscarPorEmail(principal.getUsername());
     }
 
     @PostMapping("/admin/pratos/registrar")
-    public String registrarCardapio(@ModelAttribute Cardapio c) {
-        service.criar(c);
-        return "redirect:/pratos";
+    public String registrarCardapio(@ModelAttribute Cardapio c,
+                                    @AuthenticationPrincipal UserDetails principal) {
+        service.criar(c, admin(principal).getLoja());
+        return "redirect:/admin/pratos";
     }
 
-    // Exibe o formulário de cadastro de prato
     @GetMapping("/admin/pratos/registrar")
     public ModelAndView exibirFormCardapio() {
         ModelAndView mv = new ModelAndView("registrar-prato");
@@ -31,30 +40,24 @@ public class CardapioController {
         return mv;
     }
 
+    // A antiga página única de cardápio dá lugar à vitrine de lojas.
     @GetMapping("/pratos")
-    public ModelAndView verCardapio() {
-        ModelAndView mv = new ModelAndView("pratos");
-        mv.addObject("pratos", service.listar());
-        return mv;
+    public String redirecionarParaLojas() {
+        return "redirect:/lojas";
     }
 
-    @GetMapping("/pratos/{id}")
-    public ModelAndView editarPratoForm(@PathVariable("id") Long id) {
-        ModelAndView mv = new ModelAndView("editar-prato");
-        mv.addObject("prato", service.buscarPorId(id));
-        return mv;
-    }
-
-    // Rotas para área administrativa do cardápio
     @GetMapping("/admin")
-    public String homeAdmin() {
-        return "admin-home";
+    public ModelAndView homeAdmin(@AuthenticationPrincipal UserDetails principal) {
+        Usuario a = admin(principal);
+        ModelAndView mv = new ModelAndView("admin-home");
+        mv.addObject("nomeLoja", a.getLoja() != null ? a.getLoja().getNome() : "");
+        return mv;
     }
 
     @GetMapping("/admin/pratos")
-    public ModelAndView adminCardapio() {
+    public ModelAndView adminCardapio(@AuthenticationPrincipal UserDetails principal) {
         ModelAndView mv = new ModelAndView("admin");
-        mv.addObject("itens", service.listar());
+        mv.addObject("itens", service.listarPorLoja(admin(principal).getLoja()));
         return mv;
     }
 
@@ -71,7 +74,6 @@ public class CardapioController {
         return "redirect:/admin/pratos";
     }
 
-    // Rota para deletar um prato do cardápio pelo ID
     @PostMapping("/admin/pratos/deletar/{id}")
     public String deletarPrato(@PathVariable("id") Long id) {
         service.deletar(id);

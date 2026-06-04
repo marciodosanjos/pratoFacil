@@ -32,6 +32,12 @@ public class Pedido {
     @JsonIgnore
     private Usuario cliente;
 
+    // Loja para a qual o pedido foi feito.
+    @ManyToOne
+    @JoinColumn(name = "loja_id")
+    @JsonIgnore
+    private Loja loja;
+
     public Long getId() {
         return id;
     }
@@ -78,5 +84,13 @@ public class Pedido {
 
     public void setCliente(Usuario cliente) {
         this.cliente = cliente;
+    }
+
+    public Loja getLoja() {
+        return loja;
+    }
+
+    public void setLoja(Loja loja) {
+        this.loja = loja;
     }
 }

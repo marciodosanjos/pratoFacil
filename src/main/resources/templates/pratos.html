@@ -168,8 +168,12 @@
 <body>
 
 <div class="header">
-    <h1>Nosso Cardápio</h1>
-    <p>Escolha os itens desejados e monte o seu pedido</p>
+    <h1 th:text="${loja != null} ? ${loja.nome} : 'Cardápio'">Nosso Cardápio</h1>
+    <p th:text="${loja != null and loja.descricao != null and !loja.descricao.isEmpty()} ? ${loja.descricao} : 'Escolha os itens desejados e monte o seu pedido'">Escolha os itens desejados e monte o seu pedido</p>
+</div>
+
+<div style="margin-bottom:18px;">
+    <a th:href="@{/lojas}" style="color:#cda45e;text-decoration:none;font-weight:bold;font-size:14px;">← Ver outras lojas</a>
 </div>
 
 <div class="aviso" th:if="${param.vazio}">Selecione ao menos um item para confirmar o pedido.</div>
@@ -177,6 +181,8 @@
 <div class="section-title">Pratos Principais</div>
 
 <form th:action="@{/novo-pedido}" method="POST" th:if="${!#lists.isEmpty(pratos)}">
+
+    <input type="hidden" name="lojaId" th:if="${loja != null}" th:value="${loja.id}" />
 
     <table class="menu-table">
         <tr th:each="c, iterStat : ${pratos}">

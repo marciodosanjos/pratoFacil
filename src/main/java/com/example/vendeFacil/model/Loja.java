@@ -1,23 +1,27 @@
 package com.example.vendeFacil.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+// Uma loja (estabelecimento) do marketplace. Cada empreendedor (ADMIN) é dono de
+// uma loja, que possui seu próprio cardápio e recebe seus próprios pedidos.
 @Entity
-public class Cardapio {
+@Table(name = "loja")
+public class Loja {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
     private String descricao;
-    private Double preco;
 
-    // Loja a que este prato pertence. @JsonIgnore para não aninhar a loja na API.
-    @ManyToOne
-    @JoinColumn(name = "loja_id")
-    @JsonIgnore
-    private Loja loja;
+    public Loja() {
+    }
+
+    public Loja(String nome, String descricao) {
+        this.nome = nome;
+        this.descricao = descricao;
+    }
 
     public Long getId() {
         return id;
@@ -41,21 +45,5 @@ public class Cardapio {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public Double getPreco() {
-        return preco;
-    }
-
-    public void setPreco(Double preco) {
-        this.preco = preco;
-    }
-
-    public Loja getLoja() {
-        return loja;
-    }
-
-    public void setLoja(Loja loja) {
-        this.loja = loja;
     }
 }

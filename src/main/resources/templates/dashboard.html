@@ -26,7 +26,7 @@
 <body>
 <div class="header">
     <h1>Dashboard</h1>
-    <p>Visão geral do seu negócio</p>
+    <p th:text="${nomeLoja != null and !nomeLoja.isEmpty()} ? 'Loja: ' + ${nomeLoja} : 'Visão geral do seu negócio'">Visão geral do seu negócio</p>
 </div>
 
 <div class="grid">
