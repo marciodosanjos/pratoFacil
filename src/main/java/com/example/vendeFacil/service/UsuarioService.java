@@ -1,9 +1,12 @@
 package com.example.vendeFacil.service;
 
 import com.example.vendeFacil.exception.RegraNegocioException;
+import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.model.Role;
 import com.example.vendeFacil.model.Usuario;
+import com.example.vendeFacil.repository.LojaRepository;
 import com.example.vendeFacil.repository.UsuarioRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,10 +25,12 @@ import java.util.Optional;
 public class UsuarioService implements UserDetailsService {
 
     private final UsuarioRepository repository;
+    private final LojaRepository lojaRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository, LojaRepository lojaRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.lojaRepository = lojaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -58,6 +63,36 @@ public class UsuarioService implements UserDetailsService {
         u.setEmail(email);
         u.setSenha(passwordEncoder.encode(senhaPura));
         u.setRole(Role.CLIENTE);
+        return repository.save(u);
+    }
+
+    // Cadastro de um novo vendedor: cria a loja e o usuario ADMIN dono dela.
+    @Transactional
+    public Usuario registrarVendedor(String nome, String email, String senhaPura,
+                                     String nomeLoja, String descricaoLoja) {
+        if (nome == null || nome.isBlank()) {
+            throw new RegraNegocioException("O nome é obrigatório");
+        }
+        if (email == null || email.isBlank()) {
+            throw new RegraNegocioException("O e-mail é obrigatório");
+        }
+        if (senhaPura == null || senhaPura.length() < 4) {
+            throw new RegraNegocioException("A senha deve ter ao menos 4 caracteres");
+        }
+        if (nomeLoja == null || nomeLoja.isBlank()) {
+            throw new RegraNegocioException("O nome da loja é obrigatório");
+        }
+        if (repository.existsByEmail(email)) {
+            throw new RegraNegocioException("Já existe uma conta com este e-mail");
+        }
+
+        Loja loja = lojaRepository.save(new Loja(nomeLoja, descricaoLoja));
+        Usuario u = new Usuario();
+        u.setNome(nome);
+        u.setEmail(email);
+        u.setSenha(passwordEncoder.encode(senhaPura));
+        u.setRole(Role.ADMIN);
+        u.setLoja(loja);
         return repository.save(u);
     }
 

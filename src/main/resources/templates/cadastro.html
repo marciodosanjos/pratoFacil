@@ -14,22 +14,25 @@
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
         }
         .card {
-            background: #fff; width: 100%; max-width: 400px;
+            background: #fff; width: 100%; max-width: 420px;
             border: 1px solid #e1d6c6; border-radius: 10px;
             padding: 36px 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.06);
         }
-        .brand { text-align: center; margin-bottom: 28px; }
-        .brand h1 {
-            color: var(--dark); font-size: 26px; margin: 0;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
+        .brand { text-align: center; margin-bottom: 24px; }
+        .brand h1 { color: var(--dark); font-size: 26px; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
         .brand p { color: var(--gold); font-style: italic; margin: 6px 0 0; font-size: 14px; }
         label { display:block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: bold; }
-        input {
+        input[type=text], input[type=email], input[type=password] {
             width: 100%; padding: 12px; margin-bottom: 18px;
             border: 1px solid #e1d6c6; border-radius: 6px; font-size: 15px; background:#fcfaf7;
         }
         input:focus { outline: none; border-color: var(--gold); }
+        .tipo { display:flex; gap:10px; margin-bottom:22px; }
+        .tipo-opt { flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+                    padding:12px 8px; border:1px solid #e1d6c6; border-radius:8px; cursor:pointer;
+                    font-size:14px; font-weight:bold; color:var(--muted); background:#fcfaf7; }
+        .tipo-opt input { width:auto; margin:0; accent-color:var(--gold); }
+        .tipo-opt:has(input:checked) { border-color:var(--gold); color:var(--dark); background:#fff8ef; }
         .btn {
             width: 100%; padding: 13px; border: none; border-radius: 6px;
             background: var(--gold); color: #fff; font-size: 15px; font-weight: bold;
@@ -46,7 +49,7 @@
 <div class="card">
     <div class="brand">
         <h1>PratoFácil</h1>
-        <p>Crie sua conta de cliente</p>
+        <p>Crie sua conta</p>
     </div>
 
     <div class="msg msg-erro" th:if="${param.erro}">
@@ -54,7 +57,17 @@
     </div>
 
     <form th:action="@{/cadastro}" method="post">
-        <label for="nome">Nome</label>
+
+        <div class="tipo">
+            <label class="tipo-opt">
+                <input type="radio" name="tipo" value="cliente" checked onchange="toggleTipo()"> 🙋 Sou Cliente
+            </label>
+            <label class="tipo-opt">
+                <input type="radio" name="tipo" value="vendedor" onchange="toggleTipo()"> 🏪 Sou Vendedor
+            </label>
+        </div>
+
+        <label for="nome">Seu nome</label>
         <input type="text" id="nome" name="nome" placeholder="Seu nome" required autofocus>
 
         <label for="email">E-mail</label>
@@ -63,6 +76,14 @@
         <label for="senha">Senha</label>
         <input type="password" id="senha" name="senha" placeholder="mínimo 4 caracteres" minlength="4" required>
 
+        <div id="lojaFields" style="display:none;">
+            <label for="nomeLoja">Nome da loja</label>
+            <input type="text" id="nomeLoja" name="nomeLoja" placeholder="Ex: Comida da Tia">
+
+            <label for="descricaoLoja">Descrição da loja</label>
+            <input type="text" id="descricaoLoja" name="descricaoLoja" placeholder="Ex: Marmitas caseiras">
+        </div>
+
         <button class="btn" type="submit">Criar conta</button>
     </form>
 
@@ -70,5 +91,15 @@
         Já tem conta? <a th:href="@{/login}">Entrar</a>
     </div>
 </div>
+
+<script>
+    function toggleTipo() {
+        const vendedor = document.querySelector('input[name=tipo]:checked').value === 'vendedor';
+        document.getElementById('lojaFields').style.display = vendedor ? 'block' : 'none';
+        document.getElementById('nomeLoja').required = vendedor;
+    }
+    toggleTipo();
+</script>
+
 </body>
 </html>

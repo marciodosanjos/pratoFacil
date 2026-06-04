@@ -28,11 +28,18 @@ public class AuthController {
     }
 
     @PostMapping("/cadastro")
-    public String cadastrar(@RequestParam String nome,
+    public String cadastrar(@RequestParam(defaultValue = "cliente") String tipo,
+                            @RequestParam String nome,
                             @RequestParam String email,
-                            @RequestParam String senha) {
+                            @RequestParam String senha,
+                            @RequestParam(required = false) String nomeLoja,
+                            @RequestParam(required = false) String descricaoLoja) {
         try {
-            usuarioService.registrarCliente(nome, email, senha);
+            if ("vendedor".equals(tipo)) {
+                usuarioService.registrarVendedor(nome, email, senha, nomeLoja, descricaoLoja);
+            } else {
+                usuarioService.registrarCliente(nome, email, senha);
+            }
         } catch (RegraNegocioException e) {
             // Volta ao formulario sinalizando o erro (ex.: e-mail ja cadastrado)
             return "redirect:/cadastro?erro";

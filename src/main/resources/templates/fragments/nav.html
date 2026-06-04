@@ -2,17 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <body>
 
-<!-- Menu de navegação do cliente (reutilizado nas páginas do cliente). -->
+<!-- Menu de navegação, ciente do login (anonimo / cliente / vendedor). -->
 <nav th:fragment="clienteNav"
      style="display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap;
             padding:12px; margin-bottom:24px; background:#fff; border:1px solid #e1d6c6;
             border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+
     <a th:href="@{/lojas}" style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🏪 Lojas</a>
-    <a th:href="@{/meus-pedidos}" style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🧾 Meus Pedidos</a>
-    <a th:href="@{/perfil}" style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">👤 Perfil</a>
-    <form th:action="@{/logout}" method="post" style="margin:0;">
+
+    <!-- Cliente logado -->
+    <a th:if="${auth != null and auth.logado and !auth.admin}" th:href="@{/meus-pedidos}"
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🧾 Meus Pedidos</a>
+    <a th:if="${auth != null and auth.logado and !auth.admin}" th:href="@{/perfil}"
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">👤 Perfil</a>
+
+    <!-- Vendedor logado -->
+    <a th:if="${auth != null and auth.logado and auth.admin}" th:href="@{/admin}"
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">🛠️ Meu Painel</a>
+
+    <!-- Logado: sair -->
+    <form th:if="${auth != null and auth.logado}" th:action="@{/logout}" method="post" style="margin:0;">
         <button type="submit" style="background:none; border:none; color:#cda45e; font-weight:bold; cursor:pointer; font-size:14px;">Sair</button>
     </form>
+
+    <!-- Anonimo: entrar / criar conta -->
+    <a th:if="${auth == null or !auth.logado}" th:href="@{/login}"
+       style="color:#0c0b09; text-decoration:none; font-weight:bold; font-size:14px;">Entrar</a>
+    <a th:if="${auth == null or !auth.logado}" th:href="@{/cadastro}"
+       style="color:#cda45e; text-decoration:none; font-weight:bold; font-size:14px;">Criar conta</a>
 </nav>
 
 </body>

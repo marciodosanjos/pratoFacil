@@ -26,6 +26,11 @@ public class LojaController {
         this.cardapioService = cardapioService;
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/lojas";
+    }
+
     @GetMapping("/lojas")
     public ModelAndView vitrine() {
         ModelAndView mv = new ModelAndView("lojas");
