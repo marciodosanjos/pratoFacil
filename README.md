@@ -1,5 +1,8 @@
 # PratoFácil — API REST para Gestão de Pedidos Locais
 
+> 🌐 **Aplicação no ar (deploy em nuvem):** **https://pratofacil.onrender.com**
+> *(Render, plano gratuito — o primeiro acesso pode levar ~30s para "acordar".)*
+
 Projeto da disciplina **Sistemas Distribuídos e Mobile** (Avaliação A3). É uma
 aplicação **Java + Spring Boot 4** que ajuda pequenos empreendedores do ramo
 alimentício a gerenciar o ciclo de vida dos pedidos (cardápio, pedidos e status de
@@ -136,9 +139,11 @@ export SPRING_DATASOURCE_PASSWORD="senha"
 
 ## Deploy (Render + Docker)
 
-O projeto já vem pronto para deploy: `Dockerfile` (build multi-stage) e `render.yaml`
-(Blueprint do Render). O passo a passo está em [`docs/DEPLOY.md`](docs/DEPLOY.md).
-Em resumo: criar um Web Service (runtime Docker) apontando para o repositório, definir
+A aplicação está **em produção na nuvem**: **https://pratofacil.onrender.com** — o app
+(contêiner **Docker**) e o **PostgreSQL** rodam no **Render**, validando na prática os
+conceitos de serviços em nuvem e transparência de localização. O deploy usa o
+`Dockerfile` (build multi-stage) e o `render.yaml` (Blueprint), e o passo a passo está
+em [`docs/DEPLOY.md`](docs/DEPLOY.md): Web Service runtime Docker, com
 `SPRING_PROFILES_ACTIVE=prod`, as variáveis `SPRING_DATASOURCE_*` (Postgres) e, para
 pagamentos, `ASAAS_API_KEY`.
 
