@@ -24,7 +24,8 @@ public class CardapioController {
     }
 
     private Usuario admin(UserDetails principal) {
-        return usuarioService.buscarPorEmail(principal.getUsername());
+        return usuarioService.buscarPorEmailOpcional(principal.getUsername())
+                .orElseThrow(com.example.vendeFacil.exception.SessaoInvalidaException::new);
     }
 
     @PostMapping("/admin/pratos/registrar")

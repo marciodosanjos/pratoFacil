@@ -27,7 +27,8 @@ public class PedidoController {
     }
 
     private Usuario logado(UserDetails principal) {
-        return usuarioService.buscarPorEmail(principal.getUsername());
+        return usuarioService.buscarPorEmailOpcional(principal.getUsername())
+                .orElseThrow(com.example.vendeFacil.exception.SessaoInvalidaException::new);
     }
 
     // Cliente confirma o pedido (a partir do cardápio de uma loja).

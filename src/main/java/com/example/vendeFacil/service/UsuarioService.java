@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 // Regras de negocio de usuarios + integracao com o Spring Security.
 // Implementa UserDetailsService para que o login (por e-mail) seja autenticado
@@ -63,6 +64,25 @@ public class UsuarioService implements UserDetailsService {
     public Usuario buscarPorEmail(String email) {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado: " + email));
+    }
+
+    public Optional<Usuario> buscarPorEmailOpcional(String email) {
+        return repository.findByEmail(email);
+    }
+
+    // Atualiza o perfil do usuário logado (nome e, opcionalmente, a senha).
+    public void atualizarPerfil(Usuario usuario, String nome, String novaSenha) {
+        if (nome == null || nome.isBlank()) {
+            throw new RegraNegocioException("O nome é obrigatório");
+        }
+        usuario.setNome(nome);
+        if (novaSenha != null && !novaSenha.isBlank()) {
+            if (novaSenha.length() < 4) {
+                throw new RegraNegocioException("A senha deve ter ao menos 4 caracteres");
+            }
+            usuario.setSenha(passwordEncoder.encode(novaSenha));
+        }
+        repository.save(usuario);
     }
 
     // Quantidade de clientes cadastrados (para o dashboard).

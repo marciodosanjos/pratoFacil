@@ -34,7 +34,8 @@ public class DashboardController {
 
     @GetMapping("/admin/dashboard")
     public ModelAndView dashboard(@AuthenticationPrincipal UserDetails principal) {
-        Usuario admin = usuarioService.buscarPorEmail(principal.getUsername());
+        Usuario admin = usuarioService.buscarPorEmailOpcional(principal.getUsername())
+                .orElseThrow(com.example.vendeFacil.exception.SessaoInvalidaException::new);
         Loja loja = admin.getLoja();
         List<Pedido> pedidos = pedidoService.listarDaLoja(loja);
 
