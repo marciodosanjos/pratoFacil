@@ -46,8 +46,8 @@ public class PedidoController {
         try {
             Usuario cliente = logado(principal);
             Pedido salvo = service.criar(request, cliente);
-            pagamentoService.gerarCobranca(salvo, cliente);
-            // Após confirmar o pedido, o cliente vai para a tela de pagamento.
+            // A cobrança NÃO é criada aqui: ela nasce conforme o método escolhido na
+            // tela de pagamento (PIX ou cartão), evitando cobranças que seriam canceladas.
             return "redirect:/meus-pedidos/" + salvo.getId() + "/pagamento";
         } catch (RegraNegocioException e) {
             return lojaId != null ? "redirect:/lojas/" + lojaId + "?vazio" : "redirect:/lojas";
@@ -78,7 +78,7 @@ public class PedidoController {
         return mv;
     }
 
-    // Tela de pagamento PIX do pedido (QR Code + copia-e-cola), dentro do app.
+    // Tela de pagamento do pedido (escolha de método: PIX QR Code ou cartão).
     @GetMapping("/meus-pedidos/{id}/pagamento")
     public ModelAndView pagamento(@PathVariable Long id,
                                   @AuthenticationPrincipal UserDetails principal) {
@@ -86,7 +86,19 @@ public class PedidoController {
         ModelAndView mv = new ModelAndView("pagamento");
         mv.addObject("pedido", pedido);
         mv.addObject("pix", pagamentoService.obterPix(pedido));
+        mv.addObject("asaasAtivo", pagamentoService.integracaoAtiva());
         return mv;
+    }
+
+    // Gera a cobrança PIX sob demanda (botão "Gerar QR Code PIX" da tela), para que
+    // a cobrança PIX só exista quando o cliente realmente escolhe pagar com PIX.
+    @PostMapping("/meus-pedidos/{id}/pagamento/pix")
+    public String gerarPix(@PathVariable Long id,
+                           @AuthenticationPrincipal UserDetails principal) {
+        Usuario cliente = logado(principal);
+        Pedido pedido = service.buscarDoCliente(id, cliente);
+        pagamentoService.gerarCobrancaPix(pedido, cliente);
+        return "redirect:/meus-pedidos/" + id + "/pagamento";
     }
 
     // Confirma o pagamento na tela do app. PIX: confirmação manual/simulada (o PIX

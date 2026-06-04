@@ -74,22 +74,40 @@
 
         <!-- PAINEL PIX -->
         <div class="panel active" id="painel-pix">
-            <div class="center" th:if="${pix != null}">
-                <img class="qr" th:src="'data:image/png;base64,' + ${pix.encodedImage}" alt="QR Code PIX">
-                <div class="copia">
-                    <input id="pixCode" type="text" th:value="${pix.payload}" readonly>
-                    <button type="button" onclick="copiarPix()">Copiar</button>
+            <!-- Cobrança PIX já gerada: exibe o QR Code e o copia-e-cola -->
+            <div th:if="${pix != null}">
+                <div class="center">
+                    <img class="qr" th:src="'data:image/png;base64,' + ${pix.encodedImage}" alt="QR Code PIX">
+                    <div class="copia">
+                        <input id="pixCode" type="text" th:value="${pix.payload}" readonly>
+                        <button type="button" onclick="copiarPix()">Copiar</button>
+                    </div>
+                    <p class="aviso">Escaneie o QR Code ou use o código copia-e-cola no app do seu banco.</p>
                 </div>
-                <p class="aviso">Escaneie o QR Code ou use o código copia-e-cola no app do seu banco.</p>
+                <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/confirmar'}" method="post">
+                    <input type="hidden" name="metodo" value="PIX">
+                    <button type="submit" class="btn-pagar">Confirmar pagamento</button>
+                </form>
             </div>
-            <div class="center" th:if="${pix == null}">
+            <!-- Sem cobrança ainda e integração ativa: gera a cobrança PIX sob demanda -->
+            <div class="center" th:if="${pix == null and asaasAtivo and pedido.asaasPaymentId == null}">
                 <p style="font-size:48px; margin:10px 0 0;">&#128179;</p>
-                <p class="aviso" style="margin-top:4px;">Pagamento via PIX. Clique abaixo para confirmar.</p>
+                <p class="aviso" style="margin-top:4px;">Gere o QR Code para pagar com PIX.</p>
+                <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/pix'}" method="post">
+                    <button type="submit" class="btn-pagar">Gerar QR Code PIX</button>
+                </form>
             </div>
-            <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/confirmar'}" method="post">
-                <input type="hidden" name="metodo" value="PIX">
-                <button type="submit" class="btn-pagar">Confirmar pagamento</button>
-            </form>
+            <!-- Modo simulação (sem chave do Asaas) ou cobrança sem QR: confirma localmente -->
+            <div th:if="${pix == null and (!asaasAtivo or pedido.asaasPaymentId != null)}">
+                <div class="center">
+                    <p style="font-size:48px; margin:10px 0 0;">&#128179;</p>
+                    <p class="aviso" style="margin-top:4px;">Pagamento via PIX. Clique abaixo para confirmar.</p>
+                </div>
+                <form th:action="@{'/meus-pedidos/' + ${pedido.id} + '/pagamento/confirmar'}" method="post">
+                    <input type="hidden" name="metodo" value="PIX">
+                    <button type="submit" class="btn-pagar">Confirmar pagamento</button>
+                </form>
+            </div>
         </div>
 
         <!-- PAINEL CARTÃO -->

@@ -50,7 +50,8 @@ public class PedidoRestController {
                                         @AuthenticationPrincipal UserDetails principal) {
         Usuario cliente = usuarioService.buscarPorEmail(principal.getUsername());
         Pedido salvo = service.criar(request, cliente);
-        pagamentoService.gerarCobranca(salvo, cliente);
+        // Na API o pedido já nasce com a cobrança PIX (não há fluxo de cartão por aqui).
+        pagamentoService.gerarCobrancaPix(salvo, cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 

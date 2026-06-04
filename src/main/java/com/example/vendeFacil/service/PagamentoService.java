@@ -31,11 +31,22 @@ public class PagamentoService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Gera a cobrança PIX no Asaas para um pedido recém-criado.
-    // Falhas no gateway NÃO quebram o pedido (ele apenas fica sem cobrança).
-    public void gerarCobranca(Pedido pedido, Usuario cliente) {
+    // Indica se a integração com o Asaas está ativa (chave configurada).
+    public boolean integracaoAtiva() {
+        return asaas.isConfigurado();
+    }
+
+    // Gera a cobrança PIX no Asaas SOB DEMANDA, quando o cliente escolhe pagar com
+    // PIX (não mais na criação do pedido) — assim quem paga no cartão nunca gera
+    // uma cobrança PIX que depois precisaria ser cancelada. Falhas no gateway NÃO
+    // quebram o pedido (ele apenas fica sem cobrança).
+    public void gerarCobrancaPix(Pedido pedido, Usuario cliente) {
         if (!asaas.isConfigurado() || cliente == null
                 || pedido.getValorTotal() == null || pedido.getValorTotal() <= 0) {
+            return;
+        }
+        // Evita criar uma segunda cobrança se o pedido já tiver uma.
+        if (pedido.getAsaasPaymentId() != null && !pedido.getAsaasPaymentId().isBlank()) {
             return;
         }
         try {

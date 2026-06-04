@@ -72,12 +72,15 @@ Lojas de exemplo criadas na primeira execução (cada uma com seu cardápio):
 
 ## Pagamentos (PIX e cartão)
 
-Ao finalizar o pedido, o cliente é levado a uma **tela de pagamento** com duas opções:
+Ao finalizar o pedido, o cliente é levado a uma **tela de pagamento** com duas opções.
+A cobrança no Asaas é criada **conforme o método escolhido** (uma cobrança **PIX** *ou*
+uma de **cartão**), e não na abertura do pedido — assim o painel do Asaas não recebe
+cobranças que depois precisariam ser canceladas.
 
-- **PIX** — quando a integração com o **Asaas** está configurada, o app cria a cobrança
-  e exibe o **QR Code** e o **código copia-e-cola** reais (consumindo a API do Asaas).
-  O **webhook** `/webhooks/asaas` recebe o evento de pagamento e marca o pedido como
-  **Pago** automaticamente.
+- **PIX** — quando a integração com o **Asaas** está configurada, o cliente clica em
+  **Gerar QR Code PIX** e o app cria a cobrança, exibindo o **QR Code** e o **código
+  copia-e-cola** reais (consumindo a API do Asaas). O **webhook** `/webhooks/asaas`
+  recebe o evento de pagamento e marca o pedido como **Pago** automaticamente.
 - **Cartão de crédito** — o checkout coleta os dados do cartão e do titular (CPF, CEP,
   telefone e número do endereço, exigidos pelo Asaas) e o app cria uma cobrança
   **`CREDIT_CARD`** na API do Asaas, **capturada na hora**; se aprovada, o pedido já
