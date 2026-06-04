@@ -1,18 +1,22 @@
 package com.example.vendeFacil.controller;
 
+import com.example.vendeFacil.dto.PagamentoCartaoForm;
 import com.example.vendeFacil.dto.PedidoRequest;
 import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
+import com.example.vendeFacil.model.TipoPagamento;
 import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.service.PagamentoService;
 import com.example.vendeFacil.service.PedidoService;
 import com.example.vendeFacil.service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 // Controller Web (Thymeleaf) dos pedidos: área do cliente (seus pedidos +
 // acompanhamento) e área do empreendedor (pedidos da SUA loja + gestão de status).
@@ -85,16 +89,39 @@ public class PedidoController {
         return mv;
     }
 
-    // Confirma o pagamento na tela do app (PIX ou cartão). Em sandbox a
-    // confirmação é simulada; com a chave Asaas o PIX real também confirma
-    // sozinho via webhook.
+    // Confirma o pagamento na tela do app. PIX: confirmação manual/simulada (o PIX
+    // real também confirma sozinho via webhook). CARTÃO: cria e captura a cobrança
+    // de verdade no Asaas; se for recusada, volta para a tela com a mensagem do erro.
     @PostMapping("/meus-pedidos/{id}/pagamento/confirmar")
     public String confirmarPagamento(@PathVariable Long id,
-                                     @RequestParam("metodo") com.example.vendeFacil.model.TipoPagamento metodo,
-                                     @AuthenticationPrincipal UserDetails principal) {
-        Pedido pedido = service.buscarDoCliente(id, logado(principal));
-        pagamentoService.confirmarManual(pedido, metodo);
+                                     @RequestParam("metodo") TipoPagamento metodo,
+                                     @ModelAttribute PagamentoCartaoForm cartaoForm,
+                                     @AuthenticationPrincipal UserDetails principal,
+                                     HttpServletRequest request,
+                                     RedirectAttributes redirectAttributes) {
+        Usuario cliente = logado(principal);
+        Pedido pedido = service.buscarDoCliente(id, cliente);
+        if (metodo == TipoPagamento.CARTAO_CREDITO) {
+            try {
+                pagamentoService.pagarComCartao(pedido, cliente, cartaoForm, ipDoCliente(request));
+            } catch (RegraNegocioException e) {
+                redirectAttributes.addFlashAttribute("erroPagamento", e.getMessage());
+                return "redirect:/meus-pedidos/" + id + "/pagamento?erro";
+            }
+        } else {
+            pagamentoService.confirmarManual(pedido, metodo);
+        }
         return "redirect:/meus-pedidos/" + id + "/pagamento?pago";
+    }
+
+    // IP de origem do cliente (usado pelo Asaas na análise da cobrança por cartão).
+    // Atrás de proxy (ex.: Render), o IP real vem no cabeçalho X-Forwarded-For.
+    private String ipDoCliente(HttpServletRequest request) {
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            return xff.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     // Área do empreendedor: pedidos recebidos pela SUA loja + gestão de status (RF03).

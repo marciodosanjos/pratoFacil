@@ -41,7 +41,7 @@ passo 1** — NÃO deixe `HOST_INTERNO`/`BANCO` literalmente (isso causa o erro
 | `SPRING_DATASOURCE_URL` | `jdbc:postgresql://dpg-abc123def456-a/pratofacil_db` |
 | `SPRING_DATASOURCE_USERNAME` | `pratofacil_user` |
 | `SPRING_DATASOURCE_PASSWORD` | (a senha do banco) |
-| `ASAAS_API_KEY` | (sua chave sandbox — opcional, só para o PIX real) |
+| `ASAAS_API_KEY` | (sua chave sandbox — opcional, para o pagamento real: PIX e cartão) |
 
 > A *Internal Database URL* do Render vem como `postgresql://user:senha@dpg-xxxx-a/banco`.
 > Converta para JDBC: vire `jdbc:postgresql://dpg-xxxx-a/banco` e ponha usuário/senha nos

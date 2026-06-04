@@ -58,6 +58,58 @@ public class AsaasService {
         return new Cobranca((String) resp.get("id"), (String) resp.get("invoiceUrl"), (String) resp.get("status"));
     }
 
+    // Cria uma cobrança de CARTÃO DE CRÉDITO e já tenta capturá-la na hora,
+    // enviando os dados do cartão e do titular. Se o Asaas aprovar, a cobrança
+    // volta com status CONFIRMED/RECEIVED. Em caso de recusa/dados inválidos, o
+    // Asaas responde com erro HTTP 4xx (a chamada lança exceção).
+    public Cobranca criarCobrancaCartao(String customerId, double valor, String descricao, String referencia,
+                                        DadosCartao cartao, DadosTitular titular, String remoteIp) {
+        Map<String, Object> creditCard = new HashMap<>();
+        creditCard.put("holderName", cartao.holderName());
+        creditCard.put("number", cartao.number());
+        creditCard.put("expiryMonth", cartao.expiryMonth());
+        creditCard.put("expiryYear", cartao.expiryYear());
+        creditCard.put("ccv", cartao.ccv());
+
+        Map<String, Object> holderInfo = new HashMap<>();
+        holderInfo.put("name", titular.name());
+        holderInfo.put("email", titular.email());
+        holderInfo.put("cpfCnpj", titular.cpfCnpj());
+        holderInfo.put("postalCode", titular.postalCode());
+        holderInfo.put("addressNumber", titular.addressNumber());
+        holderInfo.put("phone", titular.phone());
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("customer", customerId);
+        body.put("billingType", "CREDIT_CARD");
+        body.put("value", valor);
+        body.put("dueDate", LocalDate.now().toString()); // captura imediata
+        body.put("description", descricao);
+        body.put("externalReference", referencia);
+        body.put("creditCard", creditCard);
+        body.put("creditCardHolderInfo", holderInfo);
+        if (remoteIp != null && !remoteIp.isBlank()) {
+            body.put("remoteIp", remoteIp); // exigido pelo Asaas na cobrança por cartão
+        }
+
+        Map<?, ?> resp = client.post().uri("/payments")
+                .contentType(MediaType.APPLICATION_JSON).body(body)
+                .retrieve().body(Map.class);
+        if (resp == null) {
+            return null;
+        }
+        return new Cobranca((String) resp.get("id"), (String) resp.get("invoiceUrl"), (String) resp.get("status"));
+    }
+
+    // Remove uma cobrança no Asaas (best-effort): usado para limpar a cobrança PIX
+    // pendente quando o pedido acaba sendo pago por cartão.
+    public void removerCobranca(String paymentId) {
+        if (paymentId == null || paymentId.isBlank()) {
+            return;
+        }
+        client.delete().uri("/payments/{id}", paymentId).retrieve().toBodilessEntity();
+    }
+
     // Busca o QR Code PIX de uma cobrança: imagem (base64) + código copia-e-cola.
     public PixQrCode obterPixQrCode(String paymentId) {
         Map<?, ?> resp = client.get().uri("/payments/{id}/pixQrCode", paymentId)
@@ -74,5 +126,14 @@ public class AsaasService {
 
     // QR Code PIX: imagem em base64 (PNG) e o payload "copia e cola".
     public record PixQrCode(String encodedImage, String payload) {
+    }
+
+    // Dados do cartão enviados ao Asaas (não são armazenados no banco).
+    public record DadosCartao(String holderName, String number, String expiryMonth, String expiryYear, String ccv) {
+    }
+
+    // Dados do titular exigidos pelo Asaas para a cobrança por cartão.
+    public record DadosTitular(String name, String email, String cpfCnpj, String postalCode,
+                               String addressNumber, String phone) {
     }
 }

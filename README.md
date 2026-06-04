@@ -31,7 +31,7 @@ nos pedidos. O PratoFácil centraliza esse controle em um sistema simples e desa
 - **Java 21**
 - **Spring Boot 4** (Spring Web MVC, Spring Data JPA, Spring Security, Thymeleaf)
 - **Banco de dados:** H2 em **arquivo** (perfil `dev` — os dados persistem entre reinícios) e **PostgreSQL em nuvem / Render** (perfil `prod`); H2 em memória nos testes
-- **Pagamentos:** integração com o gateway **Asaas** (sandbox) — cobrança **PIX** (QR Code) + confirmação assíncrona via **webhook**
+- **Pagamentos:** integração com o gateway **Asaas** (sandbox) — cobrança **PIX** (QR Code, confirmação assíncrona via **webhook**) e **cartão de crédito** (cobrança `CREDIT_CARD` capturada na hora pela API)
 - **Deploy:** **Docker** (build multi-stage) + **Render** (`Dockerfile` e `render.yaml` incluídos)
 - **springdoc-openapi** (Swagger UI / OpenAPI 3)
 - **Maven** (wrapper `mvnw` incluído)
@@ -78,8 +78,12 @@ Ao finalizar o pedido, o cliente é levado a uma **tela de pagamento** com duas 
   e exibe o **QR Code** e o **código copia-e-cola** reais (consumindo a API do Asaas).
   O **webhook** `/webhooks/asaas` recebe o evento de pagamento e marca o pedido como
   **Pago** automaticamente.
-- **Cartão de crédito** — formulário de checkout (ambiente de testes; nenhum dado de
-  cartão é armazenado).
+- **Cartão de crédito** — o checkout coleta os dados do cartão e do titular (CPF, CEP,
+  telefone e número do endereço, exigidos pelo Asaas) e o app cria uma cobrança
+  **`CREDIT_CARD`** na API do Asaas, **capturada na hora**; se aprovada, o pedido já
+  fica **Pago**. Os dados do cartão são apenas **repassados** ao Asaas — **nada é
+  armazenado** no banco. Se a cobrança for recusada (cartão/CPF inválido etc.), a tela
+  exibe o motivo retornado pelo Asaas.
 
 Em seguida é exibida a **tela de confirmação** ("Pagamento confirmado!"). A integração
 é **opcional e degrada com elegância**: sem a chave do Asaas, o app funciona como uma
@@ -111,7 +115,7 @@ A aplicação sobe em `http://localhost:8080`.
 > No console H2, use **JDBC URL** `jdbc:h2:file:./data/pratofacildb`, usuário `sa` e
 > senha em branco.
 
-Para testar o **PIX real** localmente, rode com a chave do Asaas (sandbox):
+Para testar o **pagamento real** (PIX e cartão) localmente, rode com a chave do Asaas (sandbox):
 
 ```bash
 # Windows PowerShell
@@ -119,9 +123,10 @@ $env:ASAAS_API_KEY = "sua_chave_sandbox"
 ./mvnw spring-boot:run
 ```
 
-> O webhook só alcança uma URL **pública**; localmente conclua o pagamento pelo botão
+> O webhook só alcança uma URL **pública**; localmente conclua o **PIX** pelo botão
 > "Confirmar pagamento" (ou exponha o app com um túnel). O fluxo automático completo
-> (webhook) é testado no deploy.
+> (webhook) é testado no deploy. Já o **cartão** é capturado de forma **síncrona** na
+> própria requisição, então funciona localmente sem túnel.
 
 ### Executar com PostgreSQL em nuvem (perfil `prod`)
 
