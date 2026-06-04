@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - VendeFácil</title>
+    <title>Painel Administrativo - PratoFácil</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -120,7 +120,7 @@
 
 <div class="header">
     <h1>Painel de Controle</h1>
-    <p>Bem-vindo ao ambiente de gestão do VendeFácil</p>
+    <p>Bem-vindo ao ambiente de gestão do PratoFácil</p>
 </div>
 
 <div class="admin-grid">
@@ -143,7 +143,7 @@
         <span class="btn-admin">Acessar</span>
     </a>
 
-    <a th:href="@{/meus-pedidos}" class="admin-card">
+    <a th:href="@{/admin/pedidos}" class="admin-card">
         <div>
             <div class="card-icon">🛍️</div>
             <h2>Acompanhar Pedidos</h2>
@@ -155,7 +155,10 @@
 </div>
 
 <div class="footer">
-    <p>VendeFácil Admin • Painel do Estabelecimento</p>
+    <p>PratoFácil Admin • Painel do Estabelecimento</p>
+    <form th:action="@{/logout}" method="post" style="margin-top:10px;">
+        <button type="submit" style="background:none;border:none;color:#cda45e;cursor:pointer;font-weight:bold;text-decoration:underline;font-size:13px;">Sair da conta</button>
+    </form>
 </div>
 
 </body>

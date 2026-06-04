@@ -5,6 +5,7 @@ import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Cardapio;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
+import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.repository.CardapioRepository;
 import com.example.vendeFacil.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,14 @@ public class PedidoService {
         this.cardapioRepository = cardapioRepository;
     }
 
+    // Todos os pedidos (visao do empreendedor).
     public List<Pedido> listar() {
         return pedidoRepository.findAll();
+    }
+
+    // Apenas os pedidos do cliente informado (area "Meus Pedidos").
+    public List<Pedido> listarDoCliente(Usuario cliente) {
+        return pedidoRepository.findByClienteOrderByIdDesc(cliente);
     }
 
     public Pedido buscarPorId(Long id) {
@@ -34,9 +41,9 @@ public class PedidoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: " + id));
     }
 
-    // RF02 - cria o pedido. O valor total é SEMPRE calculado no servidor
-    // a partir dos pratos enviados, evitando que o cliente informe o preço.
-    public Pedido criar(Pedido pedido) {
+    // RF02 - cria o pedido vinculado ao cliente logado. O valor total é SEMPRE
+    // calculado no servidor a partir dos pratos enviados (o cliente não envia preço).
+    public Pedido criar(Pedido pedido, Usuario cliente) {
         if (pedido.getCardapios() == null || pedido.getCardapios().isEmpty()) {
             throw new RegraNegocioException("O pedido precisa ter pelo menos um item");
         }
@@ -64,9 +71,11 @@ public class PedidoService {
         pedido.setCardapios(itens);
         pedido.setValorTotal(total);
         pedido.setStatus(Status.EM_PREPARO); // todo pedido novo começa em preparo
+        pedido.setCliente(cliente);
 
         if (pedido.getNome() == null || pedido.getNome().isBlank()) {
-            pedido.setNome("Pedido #" + (System.currentTimeMillis() % 10000));
+            String quem = (cliente != null && cliente.getNome() != null) ? cliente.getNome() : "Cliente";
+            pedido.setNome("Pedido de " + quem);
         }
 
         return pedidoRepository.save(pedido);

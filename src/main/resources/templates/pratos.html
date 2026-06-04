@@ -174,7 +174,7 @@
             <td class="item-actions">
                 <span class="item-price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 45,00</span>
 
-                <input type="hidden" th:name="|pratos[${iterStat.index}].id|" th:value="${c.id}" />
+                <input type="hidden" th:name="|cardapios[${iterStat.index}].id|" th:value="${c.id}" />
 
                 <input type="number"
                        class="quantity-control"

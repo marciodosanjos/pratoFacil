@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Pedidos - PratoFácil</title>
+    <style>
+        :root { --gold:#cda45e; --cream:#faf6f0; --dark:#0c0b09; --muted:#7a6a60; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #3e322d; background-color: var(--cream);
+            margin: 0 auto; padding: 40px 20px; max-width: 860px;
+        }
+        .header { text-align: center; border-bottom: 2px dashed var(--gold); padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: var(--dark); font-size: 28px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { color: var(--gold); font-style: italic; margin: 0; }
+        .pedido-card {
+            background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 4px solid var(--gold);
+            display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;
+        }
+        .pedido-info h3 { margin: 0 0 6px; color: var(--dark); font-size: 18px; }
+        .pedido-meta { font-size: 13px; color: var(--muted); line-height: 1.6; }
+        .price-tag { font-size: 18px; font-weight: bold; color: var(--dark); display:block; margin-bottom: 8px; }
+        .status-badge { display:inline-block; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; }
+        .status-em_preparo { background:#fff9e6; color:#b89252; border:1px solid #ffe8b3; }
+        .status-saiu_para_entrega { background:#e6f0fc; color:#2155b8; border:1px solid #b3ccf0; }
+        .status-entregue { background:#e6f9ed; color:#1e7e34; border:1px solid #b3f0c2; }
+        .status-form { display:flex; gap:8px; align-items:center; margin-top:10px; }
+        .status-form select { padding:8px; border:1px solid #e1d6c6; border-radius:5px; background:#fcfaf7; font-size:14px; }
+        .btn-update { padding:8px 14px; background:var(--gold); color:#fff; border:none; border-radius:5px; font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase; }
+        .btn-update:hover { background:#b89252; }
+        .no-orders { text-align:center; padding:40px; color:var(--muted); font-style:italic; border:1px dashed #e1d6c6; background:#fcfaf7; border-radius:4px; }
+        .btn-voltar { display:inline-block; margin-top:24px; padding:11px 22px; background:transparent; color:var(--gold); border:1px solid var(--gold); border-radius:4px; text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:13px; }
+        .btn-voltar:hover { background:var(--gold); color:#fff; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Gestão de Pedidos</h1>
+    <p>Acompanhe e atualize o status de cada entrega</p>
+</div>
+
+<div th:if="${!#lists.isEmpty(pedidos)}">
+    <div class="pedido-card" th:each="p : ${pedidos}">
+        <div class="pedido-info">
+            <h3 th:text="${p.nome}">Pedido</h3>
+            <div class="pedido-meta">
+                <span>Pedido #</span><span th:text="${p.id}">1</span><br>
+                <span>Cliente: </span><span th:text="${p.cliente != null ? p.cliente.nome : '—'}">—</span>
+            </div>
+        </div>
+
+        <div style="text-align:right;">
+            <span class="price-tag" th:text="${p.valorTotal != null} ? 'R$ ' + ${#numbers.formatDecimal(p.valorTotal, 1, 'POINT', 2, 'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
+            <span th:class="'status-badge ' +
+                            (${p.status.name() == 'EM_PREPARO'} ? 'status-em_preparo' : '') +
+                            (${p.status.name() == 'SAIU_PARA_ENTREGA'} ? 'status-saiu_para_entrega' : '') +
+                            (${p.status.name() == 'ENTREGUE'} ? 'status-entregue' : '')"
+                  th:text="${p.status.descricao}">STATUS</span>
+
+            <form class="status-form" method="post"
+                  th:action="@{'/admin/pedidos/atualizar-status/' + ${p.id}}">
+                <select name="status">
+                    <option th:each="s : ${statusList}"
+                            th:value="${s}"
+                            th:text="${s.descricao}"
+                            th:selected="${s == p.status}"></option>
+                </select>
+                <button type="submit" class="btn-update">Atualizar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="no-orders" th:if="${#lists.isEmpty(pedidos)}">
+    Nenhum pedido recebido ainda.
+</div>
+
+<div style="text-align:center;">
+    <a th:href="@{/admin}" class="btn-voltar">Voltar ao painel</a>
+</div>
+
+</body>
+</html>

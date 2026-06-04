@@ -1,8 +1,15 @@
 package com.example.vendeFacil.repository;
+
 import com.example.vendeFacil.model.Pedido;
+import com.example.vendeFacil.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+
+    // Pedidos de um cliente, do mais recente para o mais antigo.
+    List<Pedido> findByClienteOrderByIdDesc(Usuario cliente);
 }

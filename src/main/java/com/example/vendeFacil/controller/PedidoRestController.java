@@ -2,24 +2,29 @@ package com.example.vendeFacil.controller;
 
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
+import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.service.PedidoService;
+import com.example.vendeFacil.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 // API REST dos pedidos. Cobre o ciclo de vida do pedido (criação e
 // atualização de status), trafegando os dados em JSON.
-// A regra de negócio mora no PedidoService; aqui só cuidamos do HTTP.
 @RestController
 @RequestMapping("/api/pedidos")
 public class PedidoRestController {
 
     private final PedidoService service;
+    private final UsuarioService usuarioService;
 
-    public PedidoRestController(PedidoService service) {
+    public PedidoRestController(PedidoService service, UsuarioService usuarioService) {
         this.service = service;
+        this.usuarioService = usuarioService;
     }
 
     // Listar todos os pedidos (GET)
@@ -34,11 +39,13 @@ public class PedidoRestController {
         return service.buscarPorId(id);
     }
 
-    // RF02 - o cliente realiza um pedido (POST).
+    // RF02 - o cliente realiza um pedido (POST), vinculado ao usuário autenticado.
     // O valor total é calculado no servidor a partir dos pratos enviados.
     @PostMapping
-    public ResponseEntity<Pedido> criar(@RequestBody Pedido pedido) {
-        Pedido salvo = service.criar(pedido);
+    public ResponseEntity<Pedido> criar(@RequestBody Pedido pedido,
+                                        @AuthenticationPrincipal UserDetails principal) {
+        Usuario cliente = usuarioService.buscarPorEmail(principal.getUsername());
+        Pedido salvo = service.criar(pedido, cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 

@@ -1,5 +1,6 @@
 package com.example.vendeFacil.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,6 +25,12 @@ public class Pedido {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    // Cliente dono do pedido. @JsonIgnore para nao expor os dados do usuario na API.
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    @JsonIgnore
+    private Usuario cliente;
 
     public Long getId() {
         return id;
@@ -65,5 +72,11 @@ public class Pedido {
         this.status = status;
     }
 
+    public Usuario getCliente() {
+        return cliente;
+    }
 
+    public void setCliente(Usuario cliente) {
+        this.cliente = cliente;
+    }
 }
