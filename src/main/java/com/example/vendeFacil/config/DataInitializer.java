@@ -8,6 +8,8 @@ import com.example.vendeFacil.model.Usuario;
 import com.example.vendeFacil.repository.CardapioRepository;
 import com.example.vendeFacil.repository.LojaRepository;
 import com.example.vendeFacil.repository.UsuarioRepository;
+import com.example.vendeFacil.util.ImagemUtil;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -41,7 +43,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 1) Comida de Vo  (login: comidadavo@pratofacil.com / vovo123)
         Loja comidaVo = criarLoja("Comida de Vó", "Comida caseira de verdade",
-                "comidadavo@pratofacil.com", "vovo123");
+                "comidadavo@pratofacil.com", "vovo123", "comida-de-vo.jpg");
         salvarPratos(comidaVo,
                 prato("Feijoada tradicional", "", 39.00, Categoria.PRATOS_PRINCIPAIS),
                 prato("Feijoada + torresmo", "", 44.00, Categoria.PRATOS_PRINCIPAIS),
@@ -64,7 +66,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2) Maozinha Burger  (login: maozinhaburger@pratofacil.com / burger123)
         Loja burger = criarLoja("Mãozinha Burger", "Hambúrgueres artesanais",
-                "maozinhaburger@pratofacil.com", "burger123");
+                "maozinhaburger@pratofacil.com", "burger123", "maozinha-burger.jpg");
         salvarPratos(burger,
                 prato("Smash Burger", "Pão, carne, queijo e molho da casa", 22.00, Categoria.LANCHES),
                 prato("X-Burger", "", 25.00, Categoria.LANCHES),
@@ -83,7 +85,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 3) Forno Italiano  (login: fornoitaliano@pratofacil.com / pizza123)
         Loja pizza = criarLoja("Forno Italiano", "Pizzas na pedra",
-                "fornoitaliano@pratofacil.com", "pizza123");
+                "fornoitaliano@pratofacil.com", "pizza123", "forno-italiano.jpg");
         salvarPratos(pizza,
                 prato("Pizza Pequena Mussarela", "4 fatias", 25.00, Categoria.PIZZAS),
                 prato("Pizza Pequena Calabresa", "4 fatias", 27.00, Categoria.PIZZAS),
@@ -104,7 +106,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 4) Imperio do Acai  (login: imperiodoacai@pratofacil.com / acai123)
         Loja acai = criarLoja("Império do Açaí", "Açaí e sorvetes",
-                "imperiodoacai@pratofacil.com", "acai123");
+                "imperiodoacai@pratofacil.com", "acai123", "imperio-do-acai.jpg");
         String complementos = "Acompanha até 3 complementos grátis: granola, leite condensado, paçoca, banana, morango, leite em pó";
         salvarPratos(acai,
                 prato("Açaí 300ml", complementos, 14.00, Categoria.ACAI),
@@ -114,8 +116,16 @@ public class DataInitializer implements CommandLineRunner {
                 prato("Sorvete (1 bola)", "", 6.00, Categoria.SOBREMESAS));
     }
 
-    private Loja criarLoja(String nome, String descricao, String emailAdmin, String senha) {
-        Loja loja = lojaRepository.save(new Loja(nome, descricao));
+    private Loja criarLoja(String nome, String descricao, String emailAdmin, String senha, String logoArquivo) {
+        Loja loja = new Loja(nome, descricao);
+        try {
+            byte[] original = new ClassPathResource("static/img/lojas/" + logoArquivo).getInputStream().readAllBytes();
+            loja.setLogo(ImagemUtil.paraQuadrado400(original));
+            loja.setLogoTipo("image/png");
+        } catch (Exception e) {
+            // se a logo nao puder ser carregada, segue sem ela
+        }
+        loja = lojaRepository.save(loja);
         if (!usuarioRepository.existsByEmail(emailAdmin)) {
             Usuario admin = new Usuario();
             admin.setNome(nome);

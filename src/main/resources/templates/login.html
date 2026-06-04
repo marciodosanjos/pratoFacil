@@ -54,6 +54,7 @@
     <div class="msg msg-ok" th:if="${param.logout}">Você saiu da sua conta.</div>
     <div class="msg msg-ok" th:if="${param.cadastro}">Conta criada! Faça login para continuar.</div>
     <div class="msg msg-erro" th:if="${param.sessao}">Sua sessão expirou. Entre novamente.</div>
+    <div class="msg msg-ok" th:if="${param.emailAlterado}">E-mail alterado! Entre novamente com o novo e-mail.</div>
 
     <form th:action="@{/login}" method="post">
         <label for="username">E-mail</label>

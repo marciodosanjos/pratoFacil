@@ -53,6 +53,7 @@ public class CardapioController {
     public ModelAndView homeAdmin(@AuthenticationPrincipal UserDetails principal) {
         Usuario a = admin(principal);
         ModelAndView mv = new ModelAndView("admin-home");
+        mv.addObject("loja", a.getLoja());
         mv.addObject("nomeLoja", a.getLoja() != null ? a.getLoja().getNome() : "");
         return mv;
     }

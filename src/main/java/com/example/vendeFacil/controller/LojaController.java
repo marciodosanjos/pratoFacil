@@ -4,6 +4,8 @@ import com.example.vendeFacil.model.Cardapio;
 import com.example.vendeFacil.model.Loja;
 import com.example.vendeFacil.service.CardapioService;
 import com.example.vendeFacil.service.LojaService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,5 +46,19 @@ public class LojaController {
         mv.addObject("loja", loja);
         mv.addObject("pratos", pratos);
         return mv;
+    }
+
+    // Serve a logo da loja (imagem). Publica, usada pelas tags <img>.
+    @GetMapping("/lojas/{id}/logo")
+    public ResponseEntity<byte[]> logo(@PathVariable Long id) {
+        Loja loja = lojaService.buscarPorId(id);
+        if (!loja.temLogo()) {
+            return ResponseEntity.notFound().build();
+        }
+        String tipo = loja.getLogoTipo() != null ? loja.getLogoTipo() : "image/png";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, tipo)
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache")
+                .body(loja.getLogo());
     }
 }

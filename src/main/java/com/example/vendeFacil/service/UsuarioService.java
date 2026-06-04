@@ -89,4 +89,25 @@ public class UsuarioService implements UserDetailsService {
     public long contarClientes() {
         return repository.countByRole(Role.CLIENTE);
     }
+
+    // Atualiza e-mail (login) e/ou senha. Retorna true se o e-mail mudou
+    // (nesse caso o usuario precisa entrar de novo, pois o login mudou).
+    public boolean atualizarLogin(Usuario usuario, String novoEmail, String novaSenha) {
+        boolean emailMudou = false;
+        if (novoEmail != null && !novoEmail.isBlank() && !novoEmail.equals(usuario.getEmail())) {
+            if (repository.existsByEmail(novoEmail)) {
+                throw new RegraNegocioException("Já existe uma conta com este e-mail");
+            }
+            usuario.setEmail(novoEmail);
+            emailMudou = true;
+        }
+        if (novaSenha != null && !novaSenha.isBlank()) {
+            if (novaSenha.length() < 4) {
+                throw new RegraNegocioException("A senha deve ter ao menos 4 caracteres");
+            }
+            usuario.setSenha(passwordEncoder.encode(novaSenha));
+        }
+        repository.save(usuario);
+        return emailMudou;
+    }
 }
