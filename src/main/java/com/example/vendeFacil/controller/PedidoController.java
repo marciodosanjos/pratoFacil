@@ -5,6 +5,7 @@ import com.example.vendeFacil.exception.RegraNegocioException;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
 import com.example.vendeFacil.model.Usuario;
+import com.example.vendeFacil.service.PagamentoService;
 import com.example.vendeFacil.service.PedidoService;
 import com.example.vendeFacil.service.UsuarioService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,10 +21,12 @@ public class PedidoController {
 
     private final PedidoService service;
     private final UsuarioService usuarioService;
+    private final PagamentoService pagamentoService;
 
-    public PedidoController(PedidoService service, UsuarioService usuarioService) {
+    public PedidoController(PedidoService service, UsuarioService usuarioService, PagamentoService pagamentoService) {
         this.service = service;
         this.usuarioService = usuarioService;
+        this.pagamentoService = pagamentoService;
     }
 
     private Usuario logado(UserDetails principal) {
@@ -37,7 +40,9 @@ public class PedidoController {
                              @RequestParam(value = "lojaId", required = false) Long lojaId,
                              @AuthenticationPrincipal UserDetails principal) {
         try {
-            Pedido salvo = service.criar(request, logado(principal));
+            Usuario cliente = logado(principal);
+            Pedido salvo = service.criar(request, cliente);
+            pagamentoService.gerarCobranca(salvo, cliente);
             return "redirect:/meus-pedidos/" + salvo.getId();
         } catch (RegraNegocioException e) {
             return lojaId != null ? "redirect:/lojas/" + lojaId + "?vazio" : "redirect:/lojas";

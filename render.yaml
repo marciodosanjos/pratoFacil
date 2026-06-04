@@ -1,0 +1,24 @@
+# Blueprint do Render: cria o Web Service do PratoFácil automaticamente.
+# No Render: New + -> Blueprint -> conecte o repositorio -> ele le este arquivo.
+# Depois preencha os valores marcados com sync:false (segredos) no painel.
+services:
+  - type: web
+    name: pratofacil
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: feat/refatoracao-backend
+    healthCheckPath: /lojas
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JAVA_OPTS
+        value: "-XX:MaxRAMPercentage=75.0"
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: ASAAS_API_KEY
+        sync: false

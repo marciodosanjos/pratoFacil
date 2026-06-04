@@ -29,6 +29,10 @@ public class Usuario {
     @JoinColumn(name = "loja_id")
     private Loja loja;
 
+    // Id do cliente correspondente no Asaas (cache para reaproveitar nas cobrancas).
+    @JsonIgnore
+    private String asaasCustomerId;
+
     public Long getId() {
         return id;
     }
@@ -75,5 +79,13 @@ public class Usuario {
 
     public void setLoja(Loja loja) {
         this.loja = loja;
+    }
+
+    public String getAsaasCustomerId() {
+        return asaasCustomerId;
+    }
+
+    public void setAsaasCustomerId(String asaasCustomerId) {
+        this.asaasCustomerId = asaasCustomerId;
     }
 }

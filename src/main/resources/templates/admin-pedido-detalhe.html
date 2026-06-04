@@ -43,6 +43,7 @@
         <p th:if="${pedido.cliente != null}"><strong>E-mail:</strong> <span th:text="${pedido.cliente.email}">—</span></p>
         <p th:if="${pedido.dataFormatada != ''}"><strong>Recebido em:</strong> <span th:text="${pedido.dataFormatada}">—</span></p>
         <p><strong>Itens:</strong> <span th:text="${pedido.totalUnidades}">0</span> unidade(s)</p>
+        <p th:if="${pedido.statusPagamento != null}"><strong>Pagamento:</strong> <span th:text="${pedido.statusPagamento.descricao}">—</span></p>
     </div>
 
     <div class="secao">Itens do pedido</div>

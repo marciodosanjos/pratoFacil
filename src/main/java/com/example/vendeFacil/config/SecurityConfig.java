@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/pratos", "/pratos/**", "/lojas", "/lojas/**",
                                  "/login", "/cadastro",
                                  "/css/**", "/js/**", "/images/**", "/webjars/**",
-                                 "/h2-console/**",
+                                 "/h2-console/**", "/webhooks/**",
                                  "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 // Leitura publica do cardapio pela API REST (RF01)
                 .requestMatchers(HttpMethod.GET, "/api/pratos/**").permitAll()

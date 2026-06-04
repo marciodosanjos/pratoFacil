@@ -39,6 +39,13 @@ public class Pedido {
 
     private LocalDateTime dataCriacao;
 
+    // Pagamento (integracao Asaas)
+    private String asaasPaymentId;
+    private String pagamentoUrl;
+
+    @Enumerated(EnumType.STRING)
+    private StatusPagamento statusPagamento;
+
     public Long getId() {
         return id;
     }
@@ -115,5 +122,29 @@ public class Pedido {
             t += i.getQuantidade();
         }
         return t;
+    }
+
+    public String getAsaasPaymentId() {
+        return asaasPaymentId;
+    }
+
+    public void setAsaasPaymentId(String asaasPaymentId) {
+        this.asaasPaymentId = asaasPaymentId;
+    }
+
+    public String getPagamentoUrl() {
+        return pagamentoUrl;
+    }
+
+    public void setPagamentoUrl(String pagamentoUrl) {
+        this.pagamentoUrl = pagamentoUrl;
+    }
+
+    public StatusPagamento getStatusPagamento() {
+        return statusPagamento;
+    }
+
+    public void setStatusPagamento(StatusPagamento statusPagamento) {
+        this.statusPagamento = statusPagamento;
     }
 }

@@ -4,6 +4,7 @@ import com.example.vendeFacil.dto.PedidoRequest;
 import com.example.vendeFacil.model.Pedido;
 import com.example.vendeFacil.model.Status;
 import com.example.vendeFacil.model.Usuario;
+import com.example.vendeFacil.service.PagamentoService;
 import com.example.vendeFacil.service.PedidoService;
 import com.example.vendeFacil.service.UsuarioService;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,12 @@ public class PedidoRestController {
 
     private final PedidoService service;
     private final UsuarioService usuarioService;
+    private final PagamentoService pagamentoService;
 
-    public PedidoRestController(PedidoService service, UsuarioService usuarioService) {
+    public PedidoRestController(PedidoService service, UsuarioService usuarioService, PagamentoService pagamentoService) {
         this.service = service;
         this.usuarioService = usuarioService;
+        this.pagamentoService = pagamentoService;
     }
 
     // Listar todos os pedidos (GET)
@@ -47,6 +50,7 @@ public class PedidoRestController {
                                         @AuthenticationPrincipal UserDetails principal) {
         Usuario cliente = usuarioService.buscarPorEmail(principal.getUsername());
         Pedido salvo = service.criar(request, cliente);
+        pagamentoService.gerarCobranca(salvo, cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
