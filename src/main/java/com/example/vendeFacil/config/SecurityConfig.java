@@ -48,7 +48,12 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/pratos", true)
+                // Redireciona conforme o papel: empreendedor -> painel admin; cliente -> cardapio
+                .successHandler((request, response, authentication) -> {
+                    boolean admin = authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                    response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/pratos"));
+                })
                 .permitAll()
             )
             .logout(logout -> logout
