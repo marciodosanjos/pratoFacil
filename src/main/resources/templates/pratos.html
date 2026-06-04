@@ -49,94 +49,70 @@
 
 <div class="aviso" th:if="${param.vazio}">Selecione ao menos um item (use o + para adicionar).</div>
 
-<div class="no-items" th:if="${porCategoria == null or porCategoria.isEmpty()}">
+<div class="no-items" th:if="${pratos == null or pratos.isEmpty()}">
     Nenhum prato disponível nesta loja no momento.
 </div>
 
-<div th:each="entry : ${porCategoria}">
-    <div class="section-title" th:text="${entry.key.descricao}">Categoria</div>
-    <div class="item" th:each="c : ${entry.value}"
-         th:attr="data-id=${c.id},data-preco=${c.preco}">
-        <div class="item-info">
-            <h3 th:text="${c.nome}">Nome do prato</h3>
-            <p th:text="${c.descricao}">Descrição</p>
-        </div>
-        <div class="item-right">
-            <span class="price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco,1,'POINT',2,'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
-            <div class="stepper">
-                <button type="button" onclick="alterar(this,-1)">−</button>
-                <span class="qty">0</span>
-                <button type="button" onclick="alterar(this,1)">+</button>
+<form th:action="@{/novo-pedido}" method="post" th:if="${pratos != null and !pratos.isEmpty()}">
+
+    <input type="hidden" name="lojaId" th:if="${loja != null}" th:value="${loja.id}">
+
+    <div th:each="c, iter : ${pratos}">
+        <div class="section-title"
+             th:if="${iter.index == 0 or pratos[iter.index - 1].categoria != c.categoria}"
+             th:text="${c.categoria != null ? c.categoria.descricao : 'Outros'}">Categoria</div>
+
+        <div class="item" th:attr="data-preco=${c.preco}">
+            <div class="item-info">
+                <h3 th:text="${c.nome}">Nome do prato</h3>
+                <p th:text="${c.descricao}">Descrição</p>
+            </div>
+            <div class="item-right">
+                <span class="price" th:text="${c.preco != null} ? 'R$ ' + ${#numbers.formatDecimal(c.preco,1,'POINT',2,'COMMA')} : 'R$ 0,00'">R$ 0,00</span>
+                <input type="hidden" th:name="|itens[${iter.index}].cardapioId|" th:value="${c.id}">
+                <input type="hidden" th:name="|itens[${iter.index}].quantidade|" value="0" class="qtd">
+                <div class="stepper">
+                    <button type="button" onclick="alterar(this,-1)">−</button>
+                    <span class="qty">0</span>
+                    <button type="button" onclick="alterar(this,1)">+</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="cartbar">
-    <div class="cart-info">
-        <span id="cart-count">Carrinho vazio</span>
-        <strong id="cart-total">R$ 0,00</strong>
+    <div class="cartbar">
+        <div class="cart-info">
+            <span id="cart-count">Carrinho vazio</span>
+            <strong id="cart-total">R$ 0,00</strong>
+        </div>
+        <button type="submit" id="cart-btn" disabled>Finalizar pedido</button>
     </div>
-    <button type="button" id="cart-btn" disabled onclick="finalizar()">Finalizar pedido</button>
-</div>
-
-<form id="pedidoForm" th:action="@{/novo-pedido}" method="post" style="display:none;">
-    <input type="hidden" name="lojaId" th:if="${loja != null}" th:value="${loja.id}">
 </form>
 
 <script>
-    const precos = {};
-    const carrinho = {};
-
-    document.querySelectorAll('.item').forEach(function (el) {
-        const id = el.dataset.id;
-        precos[id] = parseFloat(el.dataset.preco) || 0;
-        carrinho[id] = 0;
-    });
-
     function alterar(btn, delta) {
         const item = btn.closest('.item');
-        const id = item.dataset.id;
-        carrinho[id] = Math.max(0, (carrinho[id] || 0) + delta);
-        item.querySelector('.qty').textContent = carrinho[id];
+        const campoQtd = item.querySelector('.qtd');
+        let q = (parseInt(campoQtd.value, 10) || 0) + delta;
+        if (q < 0) { q = 0; }
+        campoQtd.value = q;
+        item.querySelector('.qty').textContent = q;
         render();
     }
 
     function render() {
         let count = 0, total = 0;
-        for (const id in carrinho) {
-            count += carrinho[id];
-            total += carrinho[id] * precos[id];
-        }
+        document.querySelectorAll('.item').forEach(function (item) {
+            const q = parseInt(item.querySelector('.qtd').value, 10) || 0;
+            const preco = parseFloat(item.dataset.preco) || 0;
+            count += q;
+            total += q * preco;
+        });
         document.getElementById('cart-count').textContent =
             count === 0 ? 'Carrinho vazio' : (count === 1 ? '1 item' : count + ' itens');
         document.getElementById('cart-total').textContent =
             'R$ ' + total.toFixed(2).replace('.', ',');
         document.getElementById('cart-btn').disabled = count === 0;
-    }
-
-    function finalizar() {
-        const form = document.getElementById('pedidoForm');
-        form.querySelectorAll('.item-input').forEach(function (e) { e.remove(); });
-        let i = 0;
-        for (const id in carrinho) {
-            if (carrinho[id] > 0) {
-                form.appendChild(campo('itens[' + i + '].cardapioId', id));
-                form.appendChild(campo('itens[' + i + '].quantidade', carrinho[id]));
-                i++;
-            }
-        }
-        if (i === 0) { return; }
-        form.submit();
-    }
-
-    function campo(nome, valor) {
-        const inp = document.createElement('input');
-        inp.type = 'hidden';
-        inp.name = nome;
-        inp.value = valor;
-        inp.className = 'item-input';
-        return inp;
     }
 
     render();
