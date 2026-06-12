@@ -234,7 +234,10 @@ docs/                          # PDFs: artigo, pré-projeto, apresentação e en
 
 ## Documentação
 
-- [`docs/apresentacao-pratofacil.pdf`](docs/apresentacao-pratofacil.pdf) — apresentação (pitch) do projeto.
+- 🎥 **Gravação da apresentação (pitch, até 5 min):** _(a adicionar)_
+  <!-- 👉 OUTRO MEMBRO: troque "_(a adicionar)_" da linha acima pelo link do vídeo, por exemplo:
+       - 🎥 **Gravação da apresentação (pitch, até 5 min):** [assistir](https://youtu.be/ID_DO_VIDEO) -->
+- [`docs/apresentacao-pratofacil.pdf`](docs/apresentacao-pratofacil.pdf) — slides da apresentação (pitch).
 - [`docs/ARTIGO.pdf`](docs/ARTIGO.pdf) — artigo (relatório final) da disciplina.
 - [`docs/PRE-PROJETO.pdf`](docs/PRE-PROJETO.pdf) — pré-projeto (fase de descoberta) que originou o trabalho.
 - [`docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf`](docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf) — enunciado oficial da avaliação.
