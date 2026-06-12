@@ -150,10 +150,9 @@ export SPRING_DATASOURCE_PASSWORD="senha"
 A aplicação está **em produção na nuvem**: **https://pratofacil.onrender.com** — o app
 (contêiner **Docker**) e o **PostgreSQL** rodam no **Render**, validando na prática os
 conceitos de serviços em nuvem e transparência de localização. O deploy usa o
-`Dockerfile` (build multi-stage) e o `render.yaml` (Blueprint), e o passo a passo está
-em [`docs/DEPLOY.md`](docs/DEPLOY.md): Web Service runtime Docker, com
-`SPRING_PROFILES_ACTIVE=prod`, as variáveis `SPRING_DATASOURCE_*` (Postgres) e, para
-pagamentos, `ASAAS_API_KEY`.
+`Dockerfile` (build multi-stage) e o `render.yaml` (Blueprint): um Web Service com
+runtime Docker, `SPRING_PROFILES_ACTIVE=prod`, as variáveis `SPRING_DATASOURCE_*`
+(Postgres) e, para pagamentos, `ASAAS_API_KEY`.
 
 ## Endpoints da API REST
 
@@ -230,15 +229,14 @@ src/main/java/com/example/vendeFacil
 └── config       # Segurança, OpenAPI/Swagger e carga inicial (lojas + cardápios)
 src/main/resources/templates   # Páginas HTML (Thymeleaf)
 Dockerfile · render.yaml       # Deploy (Docker + Render)
-docs/                          # Artigo, guia de deploy e roteiro de apresentação
+docs/                          # PDFs: artigo, pré-projeto, apresentação e enunciado
 ```
 
 ## Documentação
 
-- [`docs/PRE-PROJETO.pdf`](docs/PRE-PROJETO.pdf) — pré-projeto (fase de descoberta) que originou o trabalho.
+- [`docs/apresentacao-pratofacil.pdf`](docs/apresentacao-pratofacil.pdf) — apresentação (pitch) do projeto.
 - [`docs/ARTIGO.pdf`](docs/ARTIGO.pdf) — artigo (relatório final) da disciplina.
-- [`docs/DEPLOY.md`](docs/DEPLOY.md) — guia de deploy no Render.
-- [`docs/APRESENTACAO.md`](docs/APRESENTACAO.md) — roteiro da apresentação.
+- [`docs/PRE-PROJETO.pdf`](docs/PRE-PROJETO.pdf) — pré-projeto (fase de descoberta) que originou o trabalho.
 - [`docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf`](docs/Avaliacao-A3-Sistemas-Distribuidos-e-Mobile.pdf) — enunciado oficial da avaliação.
 
 ## Integrantes
