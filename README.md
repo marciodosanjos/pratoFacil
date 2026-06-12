@@ -3,7 +3,7 @@
 > 🌐 **Aplicação no ar (deploy em nuvem):** **https://pratofacil.onrender.com**
 > *(Render, plano gratuito — o primeiro acesso pode levar ~30s para "acordar".)*
 
-Projeto da disciplina **Sistemas Distribuídos e Mobile** (Avaliação A3). É uma
+Projeto da disciplina **Sistemas Distribuídos** (Avaliação A3). É uma
 aplicação **Java + Spring Boot 4** que ajuda pequenos empreendedores do ramo
 alimentício a gerenciar o ciclo de vida dos pedidos (cardápio, pedidos e status de
 entrega), aplicando na prática conceitos de sistemas distribuídos: arquitetura
