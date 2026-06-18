@@ -234,9 +234,7 @@ docs/                          # PDFs: artigo, pré-projeto, apresentação e en
 
 ## Documentação
 
-- Gravação da apresentação: _(a adicionar)_
-  <!-- 👉 OUTRO MEMBRO: troque "_(a adicionar)_" da linha acima pelo link do vídeo, por exemplo:
-       - 🎥 **Gravação da apresentação (pitch, até 5 min):** [assistir](https://youtu.be/ID_DO_VIDEO) -->
+- Gravação da apresentação: [assistir](https://drive.google.com/file/d/1Vy88V1Po4aAQzEJi1FP7ypJXrEzIe_4L/view?usp=sharing)
 - [`docs/apresentacao-pratofacil.pdf`](docs/apresentacao-pratofacil.pdf) — slides da apresentação (pitch).
 - [`docs/ARTIGO.pdf`](docs/ARTIGO.pdf) — artigo (relatório final) da disciplina.
 - [`docs/PRE-PROJETO.pdf`](docs/PRE-PROJETO.pdf) — pré-projeto (fase de descoberta) que originou o trabalho.
